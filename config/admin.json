@@ -1,0 +1,13 @@
+{
+    "admin": {
+        "assets": {
+            "collections": {
+                "search_filter_js": {
+                    "files": [
+                        "vendor/locomotivemtl/charcoal-contrib-search-filter/assets/src/scripts/charcoal/search-filter/widget/search-filter.js"
+                    ]
+                }
+            }
+        }
+    }
+}

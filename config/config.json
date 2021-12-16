@@ -1,0 +1,10 @@
+{
+    "view": {
+        "paths": [
+            "vendor/locomotivemtl/charcoal-contrib-search-filter/views/"
+        ]
+    },
+    "metadata": {
+        "paths": []
+    }
+}
