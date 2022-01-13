@@ -1,6 +1,6 @@
 <?php
 
-namespace Charcoal\SearchFilter\Widget;
+namespace Charcoal\AdvancedSearch\Widget;
 
 use Generator;
 use Psr\Log\InvalidArgumentException;
@@ -25,9 +25,9 @@ use Charcoal\Ui\Layout\LayoutAwareTrait;
 // from charcoal-loader
 use Charcoal\Loader\CollectionLoaderAwareTrait;
 /**
- * Class Search Filter Tabs Widget
+ * Class Advanced Search Tabs Widget
  */
-abstract class AbstractSearchFilterWidget extends AdminWidget implements
+abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     LayoutAwareInterface
 {
     use HttpAwareTrait;

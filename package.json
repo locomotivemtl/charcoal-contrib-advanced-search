@@ -1,7 +1,7 @@
 {
     "private": true,
-    "name": "@locomotivemtl/charcoal-contrib-search-filter",
-    "title": "Charcoal Contrib Search Filter",
+    "name": "@locomotivemtl/charcoal-contrib-advanced-search",
+    "title": "Charcoal Contrib Advanced Search",
     "version": "1.0.0",
     "author": "Locomotive <info@locomotive.ca>",
     "dependencies": {},

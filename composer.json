@@ -1,12 +1,12 @@
 {
     "type": "library",
-    "name": "locomotivemtl/charcoal-contrib-search-filter",
+    "name": "locomotivemtl/charcoal-contrib-advanced-search",
     "description": "Charcoal service provider for a collection filtering widget that uses model properties as filters.",
     "keywords": [
         "charcoal",
         "filter"
     ],
-    "homepage": "https://locomotivemtl.github.io/charcoal-contrib-search-filter/",
+    "homepage": "https://locomotivemtl.github.io/charcoal-contrib-advanced-search/",
     "license": "MIT",
     "authors": [
         {

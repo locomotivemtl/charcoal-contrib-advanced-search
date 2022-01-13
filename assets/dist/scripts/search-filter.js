@@ -1,15 +1,15 @@
 /* global Charcoal */
 ;(function ($) {
     /**
-     * Search filter widget used for filtering a list
-     * `charcoal/search-filter/widget/search-filter`
+     * Advanced search widget used for filtering a list
+     * `charcoal/advanced-search/widget/advanced-search`
      *
      * Require:
      * - jQuery
      *
      * @param  {Object}  opts Options for widget
      */
-    var SearchFilter = function (opts) {
+    var AdvancedSearch = function (opts) {
         console.log(opts);
         if (!opts.data.properties_options) {
             opts.data.properties_options = {};
@@ -18,11 +18,11 @@
         Charcoal.Admin.Widget.call(this, opts);
     };
 
-    SearchFilter.prototype             = Object.create(Charcoal.Admin.Widget.prototype);
-    SearchFilter.prototype.constructor = Charcoal.Admin.Widget_Search_Filter;
-    SearchFilter.prototype.parent      = Charcoal.Admin.Widget.prototype;
+    AdvancedSearch.prototype             = Object.create(Charcoal.Admin.Widget.prototype);
+    AdvancedSearch.prototype.constructor = Charcoal.Admin.Widget_Advanced_Search;
+    AdvancedSearch.prototype.parent      = Charcoal.Admin.Widget.prototype;
 
-    SearchFilter.prototype.init = function () {
+    AdvancedSearch.prototype.init = function () {
         this.$form = this.element();
         this.$applyBtn = $('.js-filter-apply', this.$form);
 
@@ -63,7 +63,7 @@
         });
     };
 
-    SearchFilter.prototype.countChanges = function () {
+    AdvancedSearch.prototype.countChanges = function () {
         var changeCount = $('input.changed, select.changed', this.$form).length;
         var changeCountString = '';
 
@@ -92,7 +92,7 @@
      *
      * @return this
      */
-    SearchFilter.prototype.clear = function () {
+    AdvancedSearch.prototype.clear = function () {
         // this.$input.val('');
         this.$form[0].reset();
         this.$form.find('select').selectpicker('refresh');
@@ -107,7 +107,7 @@
      *
      * @return this
      */
-    SearchFilter.prototype.submit = function () {
+    AdvancedSearch.prototype.submit = function () {
         var data, fields, filters = {}, manager, widgets, request;
 
         manager = Charcoal.Admin.manager();
@@ -144,7 +144,7 @@
      * @param  {array} query - The filters.
      * @return {object|null} A search request object or NULL.
      */
-    SearchFilter.prototype.prepare_request = function (p_filters) {
+    AdvancedSearch.prototype.prepare_request = function (p_filters) {
         var request = null, filters = [], sub_filters, opts, data = this.opts('data');
         var collection_table = this.opts('collection_table');
 
@@ -191,7 +191,7 @@
      * @param  {object} widget  - The widget to search on.
      * @return this
      */
-    SearchFilter.prototype.dispatch = function (request, widget) {
+    AdvancedSearch.prototype.dispatch = function (request, widget) {
         if (!widget) {
             return this;
         }
@@ -216,6 +216,6 @@
         return this;
     };
 
-    Charcoal.Admin.Widget_Search_Filter      = SearchFilter;
-    Charcoal.Admin.Widget_Search_Filter_Tabs = SearchFilter;
+    Charcoal.Admin.Widget_Advanced_Search      = AdvancedSearch;
+    Charcoal.Admin.Widget_Advanced_Search_Tabs = AdvancedSearch;
 }(jQuery));

@@ -4,8 +4,8 @@ module.exports = {
     },
     app: {
         files: {
-            '<%= paths.js.dist %>/charcoal.search-filter.min.js': [
-                '<%= concat.search_filter.dest %>'
+            '<%= paths.js.dist %>/charcoal.advanced-search.min.js': [
+                '<%= concat.advanced_search.dest %>'
             ]
         }
     }

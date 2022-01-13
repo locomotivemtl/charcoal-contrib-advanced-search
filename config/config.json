@@ -1,7 +1,7 @@
 {
     "view": {
         "paths": [
-            "vendor/locomotivemtl/charcoal-contrib-search-filter/views/"
+            "vendor/locomotivemtl/charcoal-contrib-advanced-search/views/"
         ]
     },
     "metadata": {

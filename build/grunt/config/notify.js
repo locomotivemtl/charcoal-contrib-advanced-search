@@ -10,7 +10,7 @@ module.exports = {
     },
     build: {
         options: {
-            message: 'Search Filter assets are compiled'
+            message: 'Advanced Search assets are compiled'
         }
     },
     javascript: {

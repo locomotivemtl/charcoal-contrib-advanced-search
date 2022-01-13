@@ -1,14 +1,14 @@
 <?php
 
-namespace Charcoal\SearchFilter\Widget;
+namespace Charcoal\AdvancedSearch\Widget;
 
 use Generator;
 use Pimple\Container;
 
 /**
- * Class Search Filter Widget
+ * Class Advanced Search Widget
  */
-class SearchFilterWidget extends AbstractSearchFilterWidget
+class AdvancedSearchWidget extends AbstractAdvancedSearchWidget
 {
     /**
      * @param Container $container DI Container.
@@ -24,7 +24,7 @@ class SearchFilterWidget extends AbstractSearchFilterWidget
      */
     public function type()
     {
-        return 'charcoal/search-filter/widget/search-filter';
+        return 'charcoal/advanced-search/widget/advanced-search';
     }
 
     /**

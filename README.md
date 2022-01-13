@@ -1,8 +1,8 @@
-Charcoal SearchFilter
+Charcoal Advanced Search
 ===============
 
-[![License][badge-license]][charcoal-contrib-search-filter]
-[![Latest Stable Version][badge-version]][charcoal-contrib-search-filter]
+[![License][badge-license]][charcoal-contrib-advanced-search]
+[![Latest Stable Version][badge-version]][charcoal-contrib-advanced-search]
 [![Code Quality][badge-scrutinizer]][dev-scrutinizer]
 [![Coverage Status][badge-coveralls]][dev-coveralls]
 [![Build Status][badge-travis]][dev-travis]
@@ -33,7 +33,7 @@ A [Charcoal][charcoal-app] service provider my cool feature.
 The preferred (and only supported) method is with Composer:
 
 ```shell
-$ composer require locomotivemtl/charcoal-contrib-search-filter
+$ composer require locomotivemtl/charcoal-contrib-advanced-search
 ```
 
 
@@ -48,14 +48,14 @@ $ composer require locomotivemtl/charcoal-contrib-search-filter
 
 ## Configuration
 
-Include the search-filter module in the projects's config file.
-This will provide everything needed for [charcoal-contrib-search-filter] to work properly.
+Include the advanced-search module in the projects's config file.
+This will provide everything needed for [charcoal-contrib-advanced-search] to work properly.
 No need for metadata/views/action/routes path etc.
 
 ```Json
 {
     "modules": {
-       "charcoal/search-filter/search-filter": {}
+       "charcoal/advanced-search/advanced-search": {}
     }
 }
 ```
@@ -63,13 +63,13 @@ No need for metadata/views/action/routes path etc.
 
 ## Usage
 
-[charcoal-contrib-search-filter] can be used as a dashboard widget to filter all the filterable widgets
+[charcoal-contrib-advanced-search] can be used as a dashboard widget to filter all the filterable widgets
 included in the template. Define a structure like this one :point_down: in a dashboard widget to create filters.
 
 ```Json
 {
     "filters": {
-        "type": "charcoal/search-filter/widget/search-filter",
+        "type": "charcoal/advanced-search/widget/advanced-search",
         "search_filters": [
             "taxonomy_1",
             "taxonomy_2",
@@ -145,9 +145,9 @@ $ grunt
 ### API Documentation
 
 -   The auto-generated `phpDocumentor` API documentation is available at:  
-    [https://locomotivemtl.github.io/charcoal-contrib-search-filter/docs/master/](https://locomotivemtl.github.io/charcoal-contrib-search-filter/docs/master/)
+    [https://locomotivemtl.github.io/charcoal-contrib-advanced-search/docs/master/](https://locomotivemtl.github.io/charcoal-contrib-advanced-search/docs/master/)
 -   The auto-generated `apigen` API documentation is available at:  
-    [https://codedoc.pub/locomotivemtl/charcoal-contrib-search-filter/master/](https://codedoc.pub/locomotivemtl/charcoal-contrib-search-filter/master/index.html)
+    [https://codedoc.pub/locomotivemtl/charcoal-contrib-advanced-search/master/](https://codedoc.pub/locomotivemtl/charcoal-contrib-advanced-search/master/index.html)
 
 
 
@@ -161,7 +161,7 @@ $ grunt
 
 ### Coding Style
 
-The charcoal-contrib-search-filter module follows the Charcoal coding-style:
+The charcoal-contrib-advanced-search module follows the Charcoal coding-style:
 
 -   [_PSR-1_][psr-1]
 -   [_PSR-2_][psr-2]
@@ -185,19 +185,19 @@ Charcoal is licensed under the MIT license. See [LICENSE](LICENSE) for details.
 
 
 
-[charcoal-contrib-search-filter]:  https://packagist.org/packages/locomotivemtl/charcoal-contrib-search-filter
+[charcoal-contrib-advanced-search]:  https://packagist.org/packages/locomotivemtl/charcoal-contrib-advanced-search
 [charcoal-app]:             https://packagist.org/packages/locomotivemtl/charcoal-app
 [charcoal-admin]:           https://packagist.org/packages/locomotivemtl/charcoal-admin
 
-[dev-scrutinizer]:    https://scrutinizer-ci.com/g/locomotivemtl/charcoal-contrib-search-filter/
-[dev-coveralls]:      https://coveralls.io/r/locomotivemtl/charcoal-contrib-search-filter
-[dev-travis]:         https://travis-ci.org/locomotivemtl/charcoal-contrib-search-filter
+[dev-scrutinizer]:    https://scrutinizer-ci.com/g/locomotivemtl/charcoal-contrib-advanced-search/
+[dev-coveralls]:      https://coveralls.io/r/locomotivemtl/charcoal-contrib-advanced-search
+[dev-travis]:         https://travis-ci.org/locomotivemtl/charcoal-contrib-advanced-search
 
-[badge-license]:      https://img.shields.io/packagist/l/locomotivemtl/charcoal-contrib-search-filter.svg?style=flat-square
-[badge-version]:      https://img.shields.io/packagist/v/locomotivemtl/charcoal-contrib-search-filter.svg?style=flat-square
-[badge-scrutinizer]:  https://img.shields.io/scrutinizer/g/locomotivemtl/charcoal-contrib-search-filter.svg?style=flat-square
-[badge-coveralls]:    https://img.shields.io/coveralls/locomotivemtl/charcoal-contrib-search-filter.svg?style=flat-square
-[badge-travis]:       https://img.shields.io/travis/locomotivemtl/charcoal-contrib-search-filter.svg?style=flat-square
+[badge-license]:      https://img.shields.io/packagist/l/locomotivemtl/charcoal-contrib-advanced-search.svg?style=flat-square
+[badge-version]:      https://img.shields.io/packagist/v/locomotivemtl/charcoal-contrib-advanced-search.svg?style=flat-square
+[badge-scrutinizer]:  https://img.shields.io/scrutinizer/g/locomotivemtl/charcoal-contrib-advanced-search.svg?style=flat-square
+[badge-coveralls]:    https://img.shields.io/coveralls/locomotivemtl/charcoal-contrib-advanced-search.svg?style=flat-square
+[badge-travis]:       https://img.shields.io/travis/locomotivemtl/charcoal-contrib-advanced-search.svg?style=flat-square
 
 [psr-1]:  https://www.php-fig.org/psr/psr-1/
 [psr-2]:  https://www.php-fig.org/psr/psr-2/

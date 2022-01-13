@@ -5,12 +5,12 @@ module.exports = {
     },
     app: {
         files: {
-            '<%= paths.css.dist %>/charcoal.search-filter.css': '<%= paths.css.src %>/**/charcoal.search-filter.scss'
+            '<%= paths.css.dist %>/charcoal.advanced-search.css': '<%= paths.css.src %>/**/charcoal.advanced-search.scss'
         }
     },
     vendors: {
         files: {
-            '<%= paths.css.dist %>/charcoal.search-filter.vendors.css': '<%= paths.css.src %>/**/charcoal.search-filter.vendors.scss'
+            '<%= paths.css.dist %>/charcoal.advanced-search.vendors.css': '<%= paths.css.src %>/**/charcoal.advanced-search.vendors.scss'
         }
     }
 };

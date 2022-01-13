@@ -2,14 +2,14 @@
     "admin": {
         "assets": {
             "collections": {
-                "search_filter_js": {
+                "advanced_search_js": {
                     "files": [
-                        "vendor/locomotivemtl/charcoal-contrib-search-filter/assets/dist/scripts/search-filter.js"
+                        "vendor/locomotivemtl/charcoal-contrib-advanced-search/assets/dist/scripts/advanced-search.js"
                     ]
                 },
-                "search_filter_css": {
+                "advanced_search_css": {
                     "files": [
-                        "vendor/locomotivemtl/charcoal-contrib-search-filter/assets/dist/styles/charcoal.search-filter.css"
+                        "vendor/locomotivemtl/charcoal-contrib-advanced-search/assets/dist/styles/charcoal.advanced-search.css"
                     ]
                 }
             }

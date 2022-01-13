@@ -1,14 +1,14 @@
 <?php
 
-namespace Charcoal\SearchFilter\Widget;
+namespace Charcoal\AdvancedSearch\Widget;
 
 use Generator;
 use Pimple\Container;
 
 /**
- * Class Search Filter Tabs Widget
+ * Class Advanced Search Tabs Widget
  */
-class SearchFilterTabsWidget extends AbstractSearchFilterWidget
+class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
 {
     private $tabs;
     private $tabsWithFilters = [];
@@ -29,7 +29,7 @@ class SearchFilterTabsWidget extends AbstractSearchFilterWidget
      */
     public function type()
     {
-        return 'charcoal/search-filter/widget/search-filter-tabs';
+        return 'charcoal/advanced-search/widget/advanced-search-tabs';
     }
 
     public function setTabs($tabs)

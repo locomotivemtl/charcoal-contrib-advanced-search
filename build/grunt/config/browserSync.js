@@ -1,7 +1,7 @@
 module.exports = {
     options: {
         open:      false,
-        proxy:     'charcoal-contrib-search-filter.test',
+        proxy:     'charcoal-contrib-advanced-search.test',
         port:      3000,
         watchTask: true,
         notify:    false

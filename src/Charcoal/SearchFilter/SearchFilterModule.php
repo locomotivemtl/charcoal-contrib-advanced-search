@@ -1,17 +1,17 @@
 <?php
 
-namespace Charcoal\SearchFilter;
+namespace Charcoal\AdvancedSearch;
 
 // from charcoal-app
 use Charcoal\App\Module\AbstractModule;
 
 /**
- * Search Filter Module
+ * Advanced Search Module
  */
-class SearchFilterModule extends AbstractModule
+class AdvancedSearchModule extends AbstractModule
 {
-    public const ADMIN_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-search-filter/config/admin.json';
-    public const APP_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-search-filter/config/config.json';
+    public const ADMIN_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-advanced-search/config/admin.json';
+    public const APP_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-advanced-search/config/config.json';
 
     /**
      * Setup the module's dependencies.
