@@ -129,7 +129,7 @@ $ composer test
 To install assets build environment: 
 
 ```shell
-$ yarn insall
+$ yarn install
 ```
 
 To run the build scripts: 

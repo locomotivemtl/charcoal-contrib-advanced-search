@@ -1,0 +1,47 @@
+.c-filters-tabs {
+	margin-bottom: 20px;
+}
+
+.c-filters-tab {
+	position: relative;
+	display: inline-block;
+	&.active {
+		button {
+			color: #fff;
+			background-color: #2f2f2f;
+			border-color: #2f2f2f;
+		}
+		&::after {
+			content: "";
+			position: absolute;
+			left: 50%;
+			top: 100%;
+			transform: translate(-50%, -30%);
+			width: 20px;
+			height: 20px;
+			margin-top: 15px;
+			border-radius: 50%;
+			background: #f0f0f0;
+		}
+	}
+}
+
+.c-filter-group {
+	background: #F0F0F0;
+	padding: 15px 50px;
+	display: none;
+	&.active {
+		display: block;
+	}
+}
+
+.c-filters .js-filter-apply .btn-label {
+	display: inline-block;
+	span {
+		display: none;
+		&.active,
+		&.filter-apply-count {
+			display: inline-block;
+		}
+	}
+}

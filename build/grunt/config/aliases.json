@@ -1,0 +1,29 @@
+{
+    "default": [
+        "sass",
+        "postcss",
+        "cssmin",
+        "concat",
+        "jscs",
+        "jshint",
+        "jsonlint",
+        "uglify",
+        "svg_sprite",
+        "notify:build"
+    ],
+
+    "scripts": [
+        "concat",
+        "jscs",
+        "jshint",
+        "jsonlint",
+        "uglify",
+        "notify:build"
+    ],
+
+    "sync": [
+        "browserSync",
+        "watch",
+        "notify:watch"
+    ]
+}

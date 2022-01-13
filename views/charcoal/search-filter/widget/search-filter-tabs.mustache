@@ -8,12 +8,34 @@
             </div>
         </div>
     {{/ label }}
+    <div class="row c-filters-tabs">
+        <div class="col-md-10">
+            {{# tabs }}
+                <div class="c-filters-tab p-2" data-tab="{{ tab_key }}">
+                    <button class="btn btn-light btn-outline-secondary" type="button">
+                        <span class="btn-label">{{ label }}</span>
+                        <i class="fa fa-angle-down"></i>
+                    </button>
+                </div>
+            {{/ tabs }}
+        </div>
+        <div class="col-md-2 text-right p-2">
+            <button class="btn btn-light btn-outline-secondary" type="button">
+                <span class="btn-label">Trier par</span>
+                <i class="fa fa-angle-down"></i>
+            </button>
+        </div>
+    </div>
     <div class="o-flex align-items-center">
         <div class="o-flex_main">
             <fieldset>
-                {{# filters }}
-                    {{> charcoal/search-filter/widget/filter }}
-                {{/ filters }}
+                {{# tabsWithFilters }}
+                    <div class="row c-filter-group" data-tab="{{ tab_key }}">
+                        {{# filters }}
+                            {{> charcoal/search-filter/widget/filter }}
+                        {{/ filters }}
+                    </div>
+                {{/ tabsWithFilters }}
             </fieldset>
         </div>
     </div>

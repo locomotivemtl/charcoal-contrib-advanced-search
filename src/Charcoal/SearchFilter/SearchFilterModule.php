@@ -10,8 +10,8 @@ use Charcoal\App\Module\AbstractModule;
  */
 class SearchFilterModule extends AbstractModule
 {
-    const ADMIN_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-search-filter/config/admin.json';
-    const APP_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-search-filter/config/config.json';
+    public const ADMIN_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-search-filter/config/admin.json';
+    public const APP_CONFIG = 'vendor/locomotivemtl/charcoal-contrib-search-filter/config/config.json';
 
     /**
      * Setup the module's dependencies.
