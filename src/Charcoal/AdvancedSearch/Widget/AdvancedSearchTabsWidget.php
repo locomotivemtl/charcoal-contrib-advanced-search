@@ -66,7 +66,11 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
                     $properties_options[$data['property_ident']] = $data;
                 }
 
-                $tabs[$key]['filters'] = $this->processFilters($value['filters'], $value['filters_options'] ?? null);
+                if (!empty($filters)) {
+                    $tabs[$key]['filters'] = $this->processFilters($value['filters'], $value['filters_options'] ?? null);
+                } else {
+                    $tabs[$key]['filters'] = [];
+                }
 
                 // Set layout for filters within tab
                 if (!empty($value['layout']) && is_array($value['layout'])) {

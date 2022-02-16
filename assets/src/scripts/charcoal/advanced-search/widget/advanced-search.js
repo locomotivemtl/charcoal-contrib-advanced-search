@@ -56,10 +56,16 @@
 
         var widget = this;
 
-        $('input, select', this.$form).on('change', function() {
+        var onChange = function (e) {
+            console.log('changed:', e.type);
             // Check for inputs with values
             $(this).addClass('changed');
             widget.countChanges();
+        };
+
+        $('input, select', this.$form).on('change', onChange);
+        $('input, select', this.$form).on('dp.change', function () {
+            console.log('select');
         });
     };
 
@@ -103,12 +109,33 @@
     };
 
     /**
+     * Filter object definition
+     * 
+     * @param {string} name Filter name.
+     * @param {string} value Filter value.
+     */
+    AdvancedSearch.prototype.filterObj = function (name, value) {
+        // Add object properties like this
+        this.name = name;
+        this.value = value;
+        this.operator = '=';
+        this.type = 'text';
+
+        if (name.endsWith("[from]") || name.endsWith("[to]")) {
+            this.type = 'daterange';
+            this.operator = 'BETWEEN';
+            this.matching = name.endsWith('[from]') ? name.replace('[from]', '[to]') : name.replace('[to]', '[from]');
+        }
+    };
+
+    /**
      * Submit the filters to all widgets
      *
      * @return this
      */
     AdvancedSearch.prototype.submit = function () {
         var data, fields, filters = {}, manager, widgets, request;
+        var that = this;
 
         manager = Charcoal.Admin.manager();
         widgets = manager.components.widgets;
@@ -124,7 +151,7 @@
                         filters[p_ident] = [];
                     }
 
-                    filters[p_ident].push(field.value);
+                    filters[p_ident].push(new that.filterObj(field.name, field.value));
                 }
             });
 
@@ -148,7 +175,7 @@
         var request = null, filters = [], sub_filters, opts, data = this.opts('data');
         var collection_table = this.opts('collection_table');
 
-        $.each(p_filters, function (prop, filter_array) {
+        $.each(p_filters, function (prop, filter_obj) {
             sub_filters = [];
             opts = data.properties_options[prop] || {};
             var filter_table = null;
@@ -157,12 +184,31 @@
                 filter_table = opts.table || null;
             }
 
-            $.each(filter_array, function (j, filter) {
-                sub_filters.push({
-                    property: prop,
-                    value:    filter,
-                    table:    filter_table,
-                });
+            $.each(filter_obj, function (j, filter) {
+                if (typeof filter !== 'undefined') {
+                    var value_override = [];
+
+                    if (filter.type === 'daterange') {
+                        // Is daterange input
+                        var matching_value = $('input[name="'+ filter.matching +'"]').val();
+
+                        if (filter.name.endsWith('[from]')) {
+                            value_override.push(filter.value);
+                            value_override.push(matching_value);
+                        } else {
+                            value_override.push(matching_value);
+                            value_override.push(filter.value);
+                        }
+
+                        p_filters[prop].pop();
+                    }
+
+                    sub_filters.push({
+                        property: prop,
+                        value:    value_override.length ? value_override : filter.value,
+                        operator: filter.operator
+                    });
+                }
             });
 
             filters.push({

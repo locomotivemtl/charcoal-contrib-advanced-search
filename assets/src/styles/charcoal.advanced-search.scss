@@ -29,6 +29,8 @@
 .c-filter-group {
 	background: #F0F0F0;
 	padding: 15px 50px;
+	border-radius: 0.25rem;
+	min-height: 30px;
 	display: none;
 	&.active {
 		display: block;
@@ -44,4 +46,9 @@
 			display: inline-block;
 		}
 	}
+}
+
+div.no-filters {
+    opacity: 0.8;
+    text-align: center;
 }

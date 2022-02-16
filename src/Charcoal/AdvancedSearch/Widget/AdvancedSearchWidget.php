@@ -32,7 +32,11 @@ class AdvancedSearchWidget extends AbstractAdvancedSearchWidget
      */
     public function filters()
     {
-        $filters = $this->processFilters($this->filters, $this->filters_options ?? null);
+        $filters = [];
+
+        if (!empty($this->filters)) {
+            $filters = $this->processFilters($this->filters, $this->filters_options ?? null);
+        }
 
         return $filters;
     }

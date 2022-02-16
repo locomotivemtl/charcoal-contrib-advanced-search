@@ -241,8 +241,11 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
                 $model = $this->modelFactory()->create($source['model']);
                 $properties = iterator_to_array($model->properties());
                 $choices = $properties[$source['property_ident']]['choices'];
-                foreach ($choices as $choice) {
-                    yield $choice;
+
+                if (is_array($choices)) {
+                    foreach ($choices as $choice) {
+                        yield $choice;
+                    }
                 }
             } elseif ($source['type'] == 'database') {
                 $model = $this->modelFactory()->create($source['model']);
