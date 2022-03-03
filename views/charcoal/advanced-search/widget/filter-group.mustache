@@ -1,0 +1,24 @@
+{{# layout }}
+	{{ start }}
+	{{# cellStartsRow }}
+	<!-- group -->
+	<section class="o-section">
+		<div class="row">
+	{{/ cellStartsRow }}
+{{/ layout }}
+
+		<div class="filter-group{{# layout }} col-md-{{ cellSpanBy12 }}{{/ layout }}">
+			{{# label }}<div class="filter-group-label">{{ . }}</div>{{/ label }}
+			{{# filters }}
+				{{> charcoal/advanced-search/widget/filter }}
+			{{/ filters }}
+		</div>
+
+{{# layout }}
+	{{# cellEndsRow }}
+		</div>
+	</section>
+	<!-- group-end -->
+	{{/ cellEndsRow }}
+	{{ end }}
+{{/ layout }}

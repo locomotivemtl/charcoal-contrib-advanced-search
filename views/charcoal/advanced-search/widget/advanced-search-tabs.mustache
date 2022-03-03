@@ -1,4 +1,4 @@
-<form id="{{ widgetId }}" class="c-filters c-table-container mt-2 mt-xl-4" method="post">
+<form id="{{ widgetId }}" class="c-filters c-table-container mt-2 mt-xl-4" method="post" autocomplete="off">
     {{# label }}
         <div class="row pb-2">
             <div class="col-6">
@@ -30,13 +30,13 @@
         <div class="o-flex_main">
             <fieldset>
                 {{# tabsWithFilters }}
-                    <div class="row c-filter-group" data-tab="{{ tab_key }}">
-                        {{# filters }}
-                            {{> charcoal/advanced-search/widget/filter }}
-                        {{/ filters }}
-                        {{^ filters }}
+                    <div class="c-filter-group" data-tab="{{ tab_key }}">
+                        {{# groups }}
+                            {{> charcoal/advanced-search/widget/filter-group }}
+                        {{/ groups }}
+                        {{^ groups }}
                             <div class="no-filters">{{#_t}}No filters{{/_t}}.</div>
-                        {{/ filters }}
+                        {{/ groups }}
                     </div>
                 {{/ tabsWithFilters }}
             </fieldset>

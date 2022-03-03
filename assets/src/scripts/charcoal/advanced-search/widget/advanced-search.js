@@ -111,15 +111,22 @@
     /**
      * Filter object definition
      * 
+     * @param {object} name Input dom object.
      * @param {string} name Filter name.
      * @param {string} value Filter value.
      */
-    AdvancedSearch.prototype.filterObj = function (name, value) {
-        // Add object properties like this
+    AdvancedSearch.prototype.filterObj = function (input, name, value) {
+        var formField = $(input).closest('.form-field');
+
         this.name = name;
         this.value = value;
-        this.operator = '=';
-        this.type = 'text';
+        this.operator = formField.data('operator').length > 0 ? formField.data('operator') : '=';
+        this.type = input.type;
+
+        // switch checkbox
+        if (this.type == 'checkbox') {
+            this.value = input.checked;
+        }
 
         if (name.endsWith("[from]") || name.endsWith("[to]")) {
             this.type = 'daterange';
@@ -142,16 +149,18 @@
 
         if (widgets.length > 0) {
             data    = this.$form.serializeArray();
-            fields  = this.$form.find(':input').serializeArray();
+            fields  = this.$form.find(':input.changed');
 
             $.each(fields, function (i, field) {
                 var p_ident = field.name.replace(/(\[.*)/gi, '');
+
                 if (!!field.value) {
+                    console.log(field);
                     if (!filters.hasOwnProperty(p_ident)) {
                         filters[p_ident] = [];
                     }
 
-                    filters[p_ident].push(new that.filterObj(field.name, field.value));
+                    filters[p_ident].push(new that.filterObj(field, field.name, field.value));
                 }
             });
 

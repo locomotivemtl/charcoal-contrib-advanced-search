@@ -25,7 +25,7 @@ use Charcoal\Ui\Layout\LayoutAwareTrait;
 // from charcoal-loader
 use Charcoal\Loader\CollectionLoaderAwareTrait;
 /**
- * Class Advanced Search Tabs Widget
+ * Class Abstract Advanced Search Widget
  */
 abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     LayoutAwareInterface

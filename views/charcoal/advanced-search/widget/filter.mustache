@@ -1,19 +1,21 @@
 {{# layout }}
 	{{ start }}
 	{{# cellStartsRow }}
-		<section class="o-section">
-			<div class="row">
+	<!-- filter -->
+	<section class="o-section">
+		<div class="row">
 	{{/ cellStartsRow }}
 {{/ layout }}
 
-	<div{{# layout }} class="col-md-{{ cellSpanBy12 }}"{{/ layout }}>
-		{{> charcoal/admin/widget/form-property-widget }}
-	</div>
+		<div{{# layout }} class="col-md-{{ cellSpanBy12 }}"{{/ layout }}>
+			{{> charcoal/advanced-search/widget/form-property-widget }}
+		</div>
 
 {{# layout }}
 	{{# cellEndsRow }}
-			</div>
-		</section>
+		</div>
+	</section>
+	<!-- filter-end -->
 	{{/ cellEndsRow }}
 	{{ end }}
 {{/ layout }}

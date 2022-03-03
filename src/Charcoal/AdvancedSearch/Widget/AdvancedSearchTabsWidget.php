@@ -54,33 +54,63 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
             $tabs = $this->tabs();
             $properties_options = [];
 
-            foreach ($tabs as $key => $value) {
-                // Process and set tab's filters
-                $filters = iterator_to_array($this->processFilters($value['filters'], $value['filters_options'] ?? null));
+            foreach ($tabs as $tabKey => $tab) {
+                $groupLayout = null;
+                if (!empty($tab['layout']) && is_array($tab['layout'])) {
+                    $groupLayout = $this->layoutBuilder->build($tab['layout']);
+                }
 
-                foreach ($filters as $propertyIdent => $propertyMetadata) {
-                    $data = $propertyMetadata->propertyData();
-                    if (!empty($data['choices'])) {
-                        $data['choices'] = iterator_to_array($data['choices']);
+                if (!empty($tab['groups'])) {
+                    foreach ($tab['groups'] as $groupKey => $group) {
+                        $group['filters_options'] = $group['filters_options'] ?? [];
+
+                        $filterLayout = null;
+
+                        if (!empty($group['layout']) && is_array($group['layout'])) {
+                            $filterLayout = $this->layoutBuilder->build($group['layout']);
+                        }
+
+                        if ($groupLayout) {
+                            $tabs[$tabKey]['groups'][$groupKey]['layout'] = $groupLayout;
+                        }
+                        $tabs[$tabKey]['groups'][$groupKey]['label'] = $group['label'] ?? '';
+                        $filters = [];
+
+                        // Process and set tab's filters
+                        if (!empty($group['filters'])) {
+                            if ($filterLayout) {
+                                foreach ($group['filters'] as $groupFilterKey => $groupFilter) {
+                                    $group['filters'][$groupFilterKey]['layout'] = $filterLayout;
+                                }
+                            }
+                            $filters = iterator_to_array($this->processFilters($group['filters'], $group['filters_options']));
+
+                            foreach ($filters as $propertyIdent => $propertyMetadata) {
+                                $data = $propertyMetadata->propertyData();
+                                if (!empty($data['choices'])) {
+                                    $data['choices'] = iterator_to_array($data['choices']);
+                                }
+                                $properties_options[$data['property_ident']] = $data;
+                            }
+                        }
+
+                        if (!empty($filters)) {
+                            $tabs[$tabKey]['groups'][$groupKey]['filters'] = $this->processFilters($group['filters'], $group['filters_options']);
+                        } else {
+                            $tabs[$tabKey]['groups'][$groupKey]['filters'] = [];
+                        }
                     }
-                    $properties_options[$data['property_ident']] = $data;
                 }
 
-                if (!empty($filters)) {
-                    $tabs[$key]['filters'] = $this->processFilters($value['filters'], $value['filters_options'] ?? null);
-                } else {
-                    $tabs[$key]['filters'] = [];
-                }
-
-                // Set layout for filters within tab
-                if (!empty($value['layout']) && is_array($value['layout'])) {
-                    $tabs[$key]['layout'] = $this->layoutBuilder->build($value['layout']);
+                // Set layout for groups within tab
+                if (!empty($tab['layout']) && is_array($tab['layout'])) {
+                    $layout = $this->layoutBuilder->build($tab['layout']);
+                    $tabs[$tabKey]['layout'] = null;
                 }
             }
 
             $this->setPropertiesOptions($properties_options);
 
-            //$tabs['filters'] = iterator_to_array($tabs['filters']);
             $this->tabsWithFilters = $tabs;
         }
 
