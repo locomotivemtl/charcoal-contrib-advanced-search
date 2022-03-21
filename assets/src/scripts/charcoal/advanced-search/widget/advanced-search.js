@@ -119,11 +119,16 @@
      */
     AdvancedSearch.prototype.filterObj = function (input, name, value) {
         var formField = $(input).closest('.form-field');
+        var dataOperator = formField.data('operator') || '';
 
         this.name = name;
         this.value = value;
-        this.operator = formField.data('operator').length > 0 ? formField.data('operator') : '=';
+        this.operator = '=';
         this.type = input.type;
+
+        if (dataOperator.length) {
+            this.operator = dataOperator;
+        }
 
         // switch checkbox
         if (this.type === 'checkbox') {
