@@ -202,7 +202,9 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     {
         foreach ($filters as $propertyIdent => $propertyMetadata) {
             if (is_string($propertyMetadata)) {
-                $filters[$propertyIdent] = $options[$propertyIdent] ?? null;
+                $propertyIdent = $propertyMetadata;
+                $propertyMetadata = $options[$propertyIdent] ?? [];
+                $filters[$propertyIdent] = $propertyMetadata;
             }
 
             if (!empty($propertyMetadata['choices_source'])) {

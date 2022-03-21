@@ -58,6 +58,7 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
                 $groupLayout = null;
                 if (!empty($tab['layout']) && is_array($tab['layout'])) {
                     $groupLayout = $this->layoutBuilder->build($tab['layout']);
+                    $tabs[$tabKey]['layout'] = $groupLayout;
                 }
 
                 if (!empty($tab['groups'])) {
@@ -68,10 +69,11 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
 
                         if (!empty($group['layout']) && is_array($group['layout'])) {
                             $filterLayout = $this->layoutBuilder->build($group['layout']);
+                            $tabs[$tabKey]['groups'][$groupKey]['layout'] = $filterLayout;
                         }
 
                         if ($groupLayout) {
-                            $tabs[$tabKey]['groups'][$groupKey]['layout'] = $groupLayout;
+                            $tabs[$tabKey]['groups'][$groupKey]['groupLayout'] = $groupLayout;
                         }
                         $tabs[$tabKey]['groups'][$groupKey]['label'] = $group['label'] ?? '';
                         $filters = [];
@@ -80,7 +82,10 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
                         if (!empty($group['filters'])) {
                             if ($filterLayout) {
                                 foreach ($group['filters'] as $groupFilterKey => $groupFilter) {
-                                    $group['filters'][$groupFilterKey]['layout'] = $filterLayout;
+                                    if (is_string($groupFilter)) {
+                                        $groupFilterKey = $groupFilter;
+                                    }
+                                    $group['filters_options'][$groupFilterKey]['layout'] = $filterLayout;
                                 }
                             }
                             $filters = iterator_to_array($this->processFilters($group['filters'], $group['filters_options']));
@@ -100,12 +105,6 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
                             $tabs[$tabKey]['groups'][$groupKey]['filters'] = [];
                         }
                     }
-                }
-
-                // Set layout for groups within tab
-                if (!empty($tab['layout']) && is_array($tab['layout'])) {
-                    $layout = $this->layoutBuilder->build($tab['layout']);
-                    $tabs[$tabKey]['layout'] = null;
                 }
             }
 
