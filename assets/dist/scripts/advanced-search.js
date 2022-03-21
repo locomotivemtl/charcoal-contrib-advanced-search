@@ -56,17 +56,18 @@
 
         var widget = this;
 
-        var onChange = function (e) {
-            console.log('changed:', e.type);
+        var onChange = function () {
             // Check for inputs with values
-            $(this).addClass('changed');
+            if (!$(this).is('input, select')) {
+                $(this).find('input, select').addClass('changed');
+            } else {
+                $(this).addClass('changed');
+            }
             widget.countChanges();
         };
 
         $('input, select', this.$form).on('change', onChange);
-        $('input, select', this.$form).on('dp.change', function () {
-            console.log('select');
-        });
+        $('.datetimepickerinput', this.$form).on('change.datetimepicker', onChange);
     };
 
     AdvancedSearch.prototype.countChanges = function () {
@@ -102,6 +103,7 @@
         // this.$input.val('');
         this.$form[0].reset();
         this.$form.find('select').selectpicker('refresh');
+        $('.datetimepickerinput').datetimepicker('clear');
         $('input.changed, select.changed', this.$form).removeClass('changed');
         this.countChanges();
         this.submit();
@@ -124,7 +126,7 @@
         this.type = input.type;
 
         // switch checkbox
-        if (this.type == 'checkbox') {
+        if (this.type === 'checkbox') {
             this.value = input.checked;
         }
 
