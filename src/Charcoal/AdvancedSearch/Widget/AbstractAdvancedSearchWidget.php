@@ -24,6 +24,9 @@ use Charcoal\Ui\Layout\LayoutAwareTrait;
 
 // from charcoal-loader
 use Charcoal\Loader\CollectionLoaderAwareTrait;
+use Charcoal\Translator\Translation;
+use Charcoal\Translator\Translator;
+
 /**
  * Class Abstract Advanced Search Widget
  */
@@ -270,6 +273,27 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
                 }
             }
         }
+    }
+
+    public function sortOptions()
+    {
+        $properties = [];
+
+        foreach ($this->sort as $key => $value) {
+            $sortOption = is_string($key) ? $key : $value;
+            $property = $this->proto()->p($sortOption);
+
+            if ($property) {
+                $propertyLabel = $this->translator()->translate($property->getLabel());
+                $properties[] = [
+                    'property' => $sortOption,
+                    'label' => $propertyLabel,
+                    'direction' => ($value['direction'] ?? 'ASC'),
+                ];
+            }
+        }
+
+        return $properties;
     }
 
     // GETTERS AND SETTERS

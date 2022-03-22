@@ -20,10 +20,25 @@
             {{/ tabs }}
         </div>
         <div class="col-md-2 text-right p-2">
-            <button class="btn btn-light btn-outline-secondary" type="button">
+            <button class="sort-dropdown btn btn-light btn-outline-secondary dropdown-toggle dropdown-toggle-split" type="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+            >
                 <span class="btn-label">Trier par</span>
-                <i class="fa fa-angle-down"></i>
+                <div class="sort-option">
+                    : <span class="sort-option-value">None</span>
+                </div>
             </button>
+
+            <div class="dropdown-menu dropdown-menu-right">
+                {{# sortOptions }}
+                    <a class="dropdown-item btn" data-property="{{ property }}" data-direction="{{ direction }}">
+                        <span class="btn-label">{{ label }}</span>
+                    </a>
+                {{/ sortOptions }}
+            </div>
+
         </div>
     </div>
     <div class="o-flex align-items-center">

@@ -60,3 +60,12 @@ div.no-filters {
     font-size: 14px;
     font-weight: 500;
 }
+
+.sort-dropdown {
+	.sort-option {
+		display: none;
+	}
+	&.selected .sort-option {
+		display: inline-block;
+	}
+}

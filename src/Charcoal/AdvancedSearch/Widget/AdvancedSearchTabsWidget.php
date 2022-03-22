@@ -92,10 +92,12 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
 
                             foreach ($filters as $propertyIdent => $propertyMetadata) {
                                 $data = $propertyMetadata->propertyData();
+                                $propertyIdent = $data['property_ident'] ?? $propertyIdent;
+
                                 if (!empty($data['choices'])) {
                                     $data['choices'] = iterator_to_array($data['choices']);
                                 }
-                                $properties_options[$data['property_ident']] = $data;
+                                $properties_options[$propertyIdent] = $data;
                             }
                         }
 

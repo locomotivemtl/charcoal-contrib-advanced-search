@@ -25,6 +25,7 @@
     AdvancedSearch.prototype.init = function () {
         this.$form = this.element();
         this.$applyBtn = $('.js-filter-apply', this.$form);
+        this.$sortBtn = $('.sort-dropdown', this.$form);
 
         this.$form.on('submit.charcoal.search.filter', function (e) {
             e.preventDefault();
@@ -34,6 +35,9 @@
         }.bind(this));
 
         this.$form.on('click.charcoal.search.filter', '.js-filter-reset', this.clear.bind(this));
+
+        // Handle change sorting
+        this.$form.on('click', '.sort-dropdown + .dropdown-menu>.dropdown-item', this.sort.bind(this));
 
         $('.c-filters-tab').on('click', function() {
             var tab_key = $(this).attr('data-tab');
@@ -100,13 +104,36 @@
      * @return this
      */
     AdvancedSearch.prototype.clear = function () {
-        // this.$input.val('');
         this.$form[0].reset();
         this.$form.find('select').selectpicker('refresh');
         $('.datetimepickerinput').datetimepicker('clear');
         $('input.changed, select.changed', this.$form).removeClass('changed');
         this.countChanges();
+
+        $(this.$sortBtn).removeClass('selected');
+
         this.submit();
+        return this;
+    };
+
+    /**
+     * Change the widget sorting order
+     * 
+     * @return this
+     */
+    AdvancedSearch.prototype.sort = function (e) {
+        console.log('Sort clicked');
+        var optionEl = $(e.target).closest('.dropdown-item');
+        var label = $('.btn-label', optionEl).text();
+
+        $(this.$sortBtn).addClass('selected').data({
+            property: optionEl.data('property'),
+            direction: optionEl.data('direction')
+        });
+        $('.sort-option', this.$sortBtn).find('.sort-option-value').text(label);
+
+        this.submit();
+
         return this;
     };
 
@@ -189,6 +216,7 @@
      */
     AdvancedSearch.prototype.prepare_request = function (p_filters) {
         var request = null, filters = [], sub_filters, opts, data = this.opts('data');
+        var orderProperty = $(this.$sortBtn).data('property');
         var collection_table = this.opts('collection_table');
 
         $.each(p_filters, function (prop, filter_obj) {
@@ -234,10 +262,23 @@
             });
         });
 
+        request = {
+            filters: null,
+            orders: null,
+        };
+
         if (filters.length) {
-            request = {
+            request.filters = {
                 filters: filters,
                 table:   collection_table
+            };
+        }
+
+        if ($(this.$sortBtn).hasClass('selected') && orderProperty) {
+            request.orders = {
+                direction: $(this.$sortBtn).data('direction'),
+                mode: $(this.$sortBtn).data('direction'),
+                property: orderProperty
             };
         }
 
@@ -267,11 +308,18 @@
         }
 
         var filters = [];
-        if (request) {
-            filters.push(request);
+        if (request.filters) {
+            filters.push(request.filters);
         }
 
         widget.set_filters(filters);
+
+        var orders = [];
+        if (request.orders) {
+            orders.push(request.orders);
+        }
+
+        widget.set_orders(orders);
 
         widget.reload();
 
