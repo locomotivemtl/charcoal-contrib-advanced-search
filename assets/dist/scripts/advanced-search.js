@@ -162,6 +162,11 @@
             this.value = input.checked;
         }
 
+        if (this.type === 'select-multiple') {
+            this.value = $(input).val();
+            this.operator = "IN";
+        }
+
         if (name.endsWith("[from]") || name.endsWith("[to]")) {
             this.type = 'daterange';
             this.operator = 'BETWEEN';
