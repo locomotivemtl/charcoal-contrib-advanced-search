@@ -10,7 +10,6 @@
      * @param  {Object}  opts Options for widget
      */
     var AdvancedSearch = function (opts) {
-        console.log(opts);
         if (!opts.data.properties_options) {
             opts.data.properties_options = {};
         }
@@ -122,7 +121,6 @@
      * @return this
      */
     AdvancedSearch.prototype.sort = function (e) {
-        console.log('Sort clicked');
         var optionEl = $(e.target).closest('.dropdown-item');
         var label = $('.btn-label', optionEl).text();
 
@@ -153,6 +151,12 @@
         this.operator = '=';
         this.type = input.type;
 
+        this.parseInvalidBetween = function (name, value) {
+            this.type = 'date';
+            this.value = value;
+            this.operator = name.endsWith("[from]") ? '>' : '<';
+        };
+
         if (dataOperator.length) {
             this.operator = dataOperator;
         }
@@ -171,6 +175,16 @@
             this.type = 'daterange';
             this.operator = 'BETWEEN';
             this.matching = name.endsWith('[from]') ? name.replace('[from]', '[to]') : name.replace('[to]', '[from]');
+
+            var matching_value = $('input[name="'+ this.matching +'"]').val();
+
+            if (!this.value.length || !matching_value.length) {
+                if (!this.value.length) {
+                    this.parseInvalidBetween(this.matching, matching_value);
+                } else {
+                    this.parseInvalidBetween(this.name, this.value);
+                }
+            }
         }
     };
 
@@ -180,7 +194,7 @@
      * @return this
      */
     AdvancedSearch.prototype.submit = function () {
-        var data, fields, filters = {}, manager, widgets, request;
+        var data, fields, filters = [], manager, widgets, request;
         var that = this;
 
         manager = Charcoal.Admin.manager();
@@ -191,15 +205,8 @@
             fields  = this.$form.find(':input.changed');
 
             $.each(fields, function (i, field) {
-                var p_ident = field.name.replace(/(\[.*)/gi, '');
-
                 if (!!field.value) {
-                    console.log(field);
-                    if (!filters.hasOwnProperty(p_ident)) {
-                        filters[p_ident] = [];
-                    }
-
-                    filters[p_ident].push(new that.filterObj(field, field.name, field.value));
+                    filters.push(new that.filterObj(field, field.name, field.value));
                 }
             });
 
@@ -220,50 +227,45 @@
      * @return {object|null} A search request object or NULL.
      */
     AdvancedSearch.prototype.prepare_request = function (p_filters) {
-        var request = null, filters = [], sub_filters, opts, data = this.opts('data');
+        var request = null, filters = [], opts, data = this.opts('data');
         var orderProperty = $(this.$sortBtn).data('property');
         var collection_table = this.opts('collection_table');
 
-        $.each(p_filters, function (prop, filter_obj) {
-            sub_filters = [];
-            opts = data.properties_options[prop] || {};
+        $.each(p_filters, function (key, filter_obj) {
+            var propName = filter_obj.name.replace(/(\[.*)/gi, '');
             var filter_table = null;
+            var value_override = [];
+
+            opts = data.properties_options[propName] || {};
 
             if (typeof opts.table !== 'undefined' && opts.table !== collection_table) {
                 filter_table = opts.table || null;
             }
 
-            $.each(filter_obj, function (j, filter) {
-                if (typeof filter !== 'undefined') {
-                    var value_override = [];
+            if (typeof filter_obj !== 'undefined') {
 
-                    if (filter.type === 'daterange') {
-                        // Is daterange input
-                        var matching_value = $('input[name="'+ filter.matching +'"]').val();
-
-                        if (filter.name.endsWith('[from]')) {
-                            value_override.push(filter.value);
-                            value_override.push(matching_value);
-                        } else {
-                            value_override.push(matching_value);
-                            value_override.push(filter.value);
-                        }
-
-                        p_filters[prop].pop();
+                if (filter_obj.type === 'daterange') {
+                    // Is daterange input
+                    if (filter_obj.operator === 'BETWEEN' && filter_obj.name.endsWith('[to]')) {
+                        return false;
                     }
 
-                    sub_filters.push({
-                        property: prop,
-                        value:    value_override.length ? value_override : filter.value,
-                        operator: filter.operator
-                    });
+                    var matching_value = $('input[name="'+ filter_obj.matching +'"]').val();
+
+                    if (filter_obj.name.endsWith('[from]')) {
+                        value_override = [ filter_obj.value, matching_value ];
+                    } else {
+                        value_override = [ matching_value, filter_obj.value ];
+                    }
                 }
-            });
+            }
 
             filters.push({
                 conjunction: opts.conjunction || 'AND',
                 table:       filter_table,
-                filters:     sub_filters
+                property:    propName,
+                value:       value_override.length ? value_override : filter_obj.value,
+                operator:    filter_obj.operator
             });
         });
 
@@ -287,7 +289,7 @@
             };
         }
 
-        console.log(filters);
+        console.log('Filters:', filters);
 
         return request;
     };
