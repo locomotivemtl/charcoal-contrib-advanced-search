@@ -201,7 +201,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
         return $this->propertyInputFactory;
     }
 
-    public function processFilters(array $filters, ?array $options = [])
+    public function processFilters(array $filters, array $options = [])
     {
         foreach ($filters as $propertyIdent => $propertyMetadata) {
             if (is_string($propertyMetadata)) {

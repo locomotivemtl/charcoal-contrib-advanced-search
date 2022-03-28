@@ -95,7 +95,7 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
                                 $propertyIdent = $data['property_ident'] ?? $propertyIdent;
 
                                 if (!empty($data['choices'])) {
-                                    $data['choices'] = iterator_to_array($data['choices']);
+                                    $data['choices'] = is_array($data['choices']) ? $data['choices'] : iterator_to_array($data['choices']);
                                 }
                                 $properties_options[$propertyIdent] = $data;
                             }

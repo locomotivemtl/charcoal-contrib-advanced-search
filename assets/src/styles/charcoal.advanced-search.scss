@@ -69,3 +69,49 @@ div.no-filters {
 		display: inline-block;
 	}
 }
+
+.c-filters {
+	.form-group {
+		margin-bottom: 0;
+		&.switch-sm {
+			display: flex;
+			justify-content: space-between;
+			label {
+				padding-right: 10px;
+			}
+		}
+	}
+}
+
+.filter-group {
+	padding: 0 30px;
+}
+
+$switch-thumb-padding: 2px;
+$switch-height-xs: calc(calc(1.5em + 1rem + #{$switch-thumb-padding}) * .6);
+
+.switch.switch-xs {
+	font-size: calc($font-size-sm / 2);
+
+	input {
+		+ label {
+			min-width: calc(#{$switch-height-xs} * 2);
+			height: $switch-height-xs;
+			line-height: $switch-height-xs;
+			text-indent: calc(calc(#{$switch-height-xs} * 2) + .5rem);
+		}
+
+		+ label::before {
+			width: calc(#{$switch-height-xs} * 2);
+		}
+
+		+ label::after {
+			width: calc(#{$switch-height-xs} - calc(#{$switch-thumb-padding} * 2));
+			height: calc(#{$switch-height-xs} - calc(#{$switch-thumb-padding} * 2));
+		}
+
+		&:checked + label::after {
+			margin-left: $switch-height-xs;
+		}
+	}
+}
