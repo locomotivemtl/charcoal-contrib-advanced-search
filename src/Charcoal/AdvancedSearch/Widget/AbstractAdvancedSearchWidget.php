@@ -5,6 +5,7 @@ namespace Charcoal\AdvancedSearch\Widget;
 use Psr\Log\InvalidArgumentException;
 use Pimple\Container;
 use RuntimeException;
+use Generator;
 
 // from charcoal-admin
 use Charcoal\Admin\AdminWidget;
@@ -198,6 +199,88 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
         return $this->propertyInputFactory;
     }
 
+    /**
+     * Process filter groups.
+     *
+     * @param array $groups
+     * @param array $layout
+     * @return array
+     */
+    public function processGroups(array $groups, array $layout = [])
+    {
+        $properties_options = [];
+        $groupLayout = null;
+
+        if (!empty($layout) && is_array($layout)) {
+            $groupLayout = $this->layoutBuilder->build($layout);
+        }
+
+        if (!empty($groups)) {
+            foreach ($groups as $groupKey => $group) {
+                $filters = [];
+                $group['filters_options'] = $group['filters_options'] ?? [];
+                $filterLayout = null;
+
+                if (!empty($group['layout']) && is_array($group['layout'])) {
+                    $filterLayout = $this->layoutBuilder->build($group['layout']);
+                    $groups[$groupKey]['layout'] = $filterLayout;
+                }
+
+                // Set group layout + label
+                if ($groupLayout) {
+                    $groups[$groupKey]['groupLayout'] = $groupLayout;
+                }
+                $groups[$groupKey]['label'] = $group['label'] ?? '';
+
+                // Process and set tab's filters
+                if (!empty($group['filters'])) {
+                    if ($filterLayout) {
+                        foreach ($group['filters'] as $groupFilterKey => $groupFilter) {
+                            if (is_string($groupFilter)) {
+                                $groupFilterKey = $groupFilter;
+                            }
+                            $group['filters_options'][$groupFilterKey]['layout'] = $filterLayout;
+                        }
+                    }
+                    $filters = iterator_to_array($this->processFilters(
+                        $group['filters'],
+                        $group['filters_options']
+                    ));
+
+                    foreach ($filters as $propertyIdent => $propertyMetadata) {
+                        $data = $propertyMetadata->propertyData();
+                        $propertyIdent = $data['property_ident'] ?? $propertyIdent;
+
+                        if (!empty($data['choices']) && !is_array($data['choices'])) {
+                            $data['choices'] = iterator_to_array($data['choices']);
+                        }
+                        $properties_options[$propertyIdent] = $data;
+                    }
+                }
+
+                $groups[$groupKey]['filters'] = [];
+
+                if (!empty($filters)) {
+                    $groups[$groupKey]['filters'] = $this->processFilters(
+                        $group['filters'],
+                        $group['filters_options']
+                    );
+                }
+            }
+        }
+
+        $this->addPropertiesOptions($properties_options);
+
+        return $groups;
+    }
+
+    /**
+     * Process filters.
+     *
+     * @param array $filters
+     * @param array $options
+     * @return Generator
+     */
     public function processFilters(array $filters, array $options = [])
     {
         foreach ($filters as $propertyIdent => $propertyMetadata) {
@@ -234,6 +317,12 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
         }
     }
 
+    /**
+     * Convert choices json to objects.
+     *
+     * @param array $propertyMeta
+     * @return Generator
+     */
     private function choicesSourceToChoices($propertyMeta = [])
     {
         if (empty($propertyMeta['choices']) && !empty($propertyMeta['choices_source'])) {
@@ -272,6 +361,11 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
         }
     }
 
+    /**
+     * Get sorting options.
+     *
+     * @return array
+     */
     public function sortOptions()
     {
         $properties = [];
@@ -370,6 +464,20 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     public function setPropertiesOptions(array $properties)
     {
         $this->propertiesOptions = $properties;
+
+        return $this;
+    }
+
+    /**
+     * @param array $properties The options to customize the group properties.
+     * @return self
+     */
+    public function addPropertiesOptions(array $properties)
+    {
+        $this->propertiesOptions = array_merge(
+            $this->propertiesOptions,
+            $properties
+        );
 
         return $this;
     }

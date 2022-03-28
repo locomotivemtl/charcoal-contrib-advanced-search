@@ -2,7 +2,6 @@
 
 namespace Charcoal\AdvancedSearch\Widget;
 
-use Generator;
 use Pimple\Container;
 
 /**
@@ -10,6 +9,10 @@ use Pimple\Container;
  */
 class AdvancedSearchWidget extends AbstractAdvancedSearchWidget
 {
+    private $layout;
+    private $groups = [];
+    private $groupsWithFilters = [];
+
     /**
      * @param Container $container DI Container.
      * @return void
@@ -27,17 +30,42 @@ class AdvancedSearchWidget extends AbstractAdvancedSearchWidget
         return 'charcoal/advanced-search/widget/advanced-search';
     }
 
-    /**
-     * @return Generator
-     */
-    public function filters()
+    public function setLayout($layout)
     {
-        $filters = [];
+        $this->layout = $layout;
+        return $this;
+    }
 
-        if (!empty($this->filters)) {
-            $filters = $this->processFilters($this->filters, $this->filters_options ?? null);
+    /**
+     * @return array
+     */
+    public function layout()
+    {
+        return $this->layout;
+    }
+
+    public function setGroups($groups)
+    {
+        foreach ($groups as $key => $group) {
+            $groups[$key]['group_key'] = $key;
         }
 
-        return $filters;
+        $this->groups = $groups;
+        return $this;
+    }
+
+    public function groups()
+    {
+        return $this->groups;
+    }
+
+    public function groupsWithFilters()
+    {
+        if (empty($this->groupsWithFilters)) {
+            $groups = $this->processGroups($this->groups(), $this->layout());
+            $this->groupsWithFilters = $groups;
+        }
+
+        return $this->groupsWithFilters;
     }
 }
