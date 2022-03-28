@@ -14,6 +14,9 @@
                 <div class="c-filters-tab p-2" data-tab="{{ tab_key }}">
                     <button class="btn btn-light btn-outline-secondary" type="button">
                         <span class="btn-label">{{ label }}</span>
+                        <div class="tab-filter-count" data-count="0">
+                            (<span class="count">0</span>)
+                        </div>
                         <i class="fa fa-angle-down"></i>
                     </button>
                 </div>
@@ -25,13 +28,16 @@
                 aria-haspopup="true"
                 aria-expanded="false"
             >
-                <span class="btn-label">Trier par</span>
+                <span class="btn-label">{{#_t}}sort_by{{/_t}}</span>
                 <div class="sort-option">
                     : <span class="sort-option-value">None</span>
                 </div>
             </button>
 
             <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item btn default" data-property="{{ property }}" data-direction="{{ direction }}">
+                    <span class="btn-label">-- {{#_t}}default_sort{{/_t}} --</span>
+                </a>
                 {{# sortOptions }}
                     <a class="dropdown-item btn" data-property="{{ property }}" data-direction="{{ direction }}">
                         <span class="btn-label">{{ label }}</span>

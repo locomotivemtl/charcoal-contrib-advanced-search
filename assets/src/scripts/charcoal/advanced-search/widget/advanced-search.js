@@ -95,6 +95,15 @@
 
         // Apppend change count to apply button
         $('.filter-apply-count', this.$applyBtn).text(changeCountString);
+
+        // Add tab filter count to tab label
+        $('.c-filter-group').each(function () {
+            var tabChangeCount = $('input.changed, select.changed', this).length;
+            var tabFilterCountEl = $('.c-filters-tab[data-tab="'+ $(this).data('tab') +'"] .tab-filter-count');
+
+            tabFilterCountEl.attr('data-count', tabChangeCount);
+            tabFilterCountEl.find('.count').text(tabChangeCount);
+        });
     };
 
     /**
@@ -124,11 +133,17 @@
         var optionEl = $(e.target).closest('.dropdown-item');
         var label = $('.btn-label', optionEl).text();
 
-        $(this.$sortBtn).addClass('selected').data({
-            property: optionEl.data('property'),
-            direction: optionEl.data('direction')
-        });
-        $('.sort-option', this.$sortBtn).find('.sort-option-value').text(label);
+        if ($(optionEl).hasClass('default')) {
+            // Reset button to default sort
+            $(this.$sortBtn).removeClass('selected');
+        } else {
+            // Perform sort
+            $(this.$sortBtn).addClass('selected').data({
+                property: optionEl.data('property'),
+                direction: optionEl.data('direction')
+            });
+            $('.sort-option', this.$sortBtn).find('.sort-option-value').text(label);
+        }
 
         this.submit();
 

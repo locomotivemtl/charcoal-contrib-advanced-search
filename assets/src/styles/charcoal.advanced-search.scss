@@ -1,5 +1,12 @@
 .c-filters-tabs {
 	margin-bottom: 20px;
+
+	.tab-filter-count {
+		display: inline-block;
+		&[data-count="0"] {
+			display: none;
+		}
+	}
 }
 
 .c-filters-tab {
