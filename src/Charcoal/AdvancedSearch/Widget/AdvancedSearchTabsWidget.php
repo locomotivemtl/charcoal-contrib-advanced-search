@@ -2,7 +2,6 @@
 
 namespace Charcoal\AdvancedSearch\Widget;
 
-use Generator;
 use Pimple\Container;
 
 /**
@@ -20,8 +19,6 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
     public function setDependencies(Container $container)
     {
         parent::setDependencies($container);
-
-        $properties_options = [];
     }
 
     /**
@@ -56,15 +53,15 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
 
             foreach ($tabs as $tabKey => $tab) {
                 $groupLayout = null;
+
                 if (!empty($tab['layout']) && is_array($tab['layout'])) {
                     $groupLayout = $this->layoutBuilder->build($tab['layout']);
-                    $tabs[$tabKey]['layout'] = $groupLayout;
                 }
 
                 if (!empty($tab['groups'])) {
                     foreach ($tab['groups'] as $groupKey => $group) {
+                        $filters = [];
                         $group['filters_options'] = $group['filters_options'] ?? [];
-
                         $filterLayout = null;
 
                         if (!empty($group['layout']) && is_array($group['layout'])) {
@@ -72,11 +69,11 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
                             $tabs[$tabKey]['groups'][$groupKey]['layout'] = $filterLayout;
                         }
 
+                        // Set group layout + label
                         if ($groupLayout) {
                             $tabs[$tabKey]['groups'][$groupKey]['groupLayout'] = $groupLayout;
                         }
                         $tabs[$tabKey]['groups'][$groupKey]['label'] = $group['label'] ?? '';
-                        $filters = [];
 
                         // Process and set tab's filters
                         if (!empty($group['filters'])) {
@@ -88,30 +85,35 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
                                     $group['filters_options'][$groupFilterKey]['layout'] = $filterLayout;
                                 }
                             }
-                            $filters = iterator_to_array($this->processFilters($group['filters'], $group['filters_options']));
+                            $filters = iterator_to_array($this->processFilters(
+                                $group['filters'],
+                                $group['filters_options']
+                            ));
 
                             foreach ($filters as $propertyIdent => $propertyMetadata) {
                                 $data = $propertyMetadata->propertyData();
                                 $propertyIdent = $data['property_ident'] ?? $propertyIdent;
 
-                                if (!empty($data['choices'])) {
-                                    $data['choices'] = is_array($data['choices']) ? $data['choices'] : iterator_to_array($data['choices']);
+                                if (!empty($data['choices']) && !is_array($data['choices'])) {
+                                    $data['choices'] = iterator_to_array($data['choices']);
                                 }
                                 $properties_options[$propertyIdent] = $data;
                             }
                         }
 
+                        $tabs[$tabKey]['groups'][$groupKey]['filters'] = [];
+
                         if (!empty($filters)) {
-                            $tabs[$tabKey]['groups'][$groupKey]['filters'] = $this->processFilters($group['filters'], $group['filters_options']);
-                        } else {
-                            $tabs[$tabKey]['groups'][$groupKey]['filters'] = [];
+                            $tabs[$tabKey]['groups'][$groupKey]['filters'] = $this->processFilters(
+                                $group['filters'],
+                                $group['filters_options']
+                            );
                         }
                     }
                 }
             }
 
             $this->setPropertiesOptions($properties_options);
-
             $this->tabsWithFilters = $tabs;
         }
 

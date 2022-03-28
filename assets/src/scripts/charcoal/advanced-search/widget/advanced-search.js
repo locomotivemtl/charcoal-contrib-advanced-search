@@ -13,7 +13,6 @@
         if (!opts.data.properties_options) {
             opts.data.properties_options = {};
         }
-
         Charcoal.Admin.Widget.call(this, opts);
     };
 
@@ -22,14 +21,13 @@
     AdvancedSearch.prototype.parent      = Charcoal.Admin.Widget.prototype;
 
     AdvancedSearch.prototype.init = function () {
-        this.$form = this.element();
+        this.$form     = this.element();
         this.$applyBtn = $('.js-filter-apply', this.$form);
-        this.$sortBtn = $('.sort-dropdown', this.$form);
+        this.$sortBtn  = $('.sort-dropdown', this.$form);
 
         this.$form.on('submit.charcoal.search.filter', function (e) {
             e.preventDefault();
             e.stopPropagation();
-
             this.submit();
         }.bind(this));
 
@@ -58,7 +56,6 @@
         }
 
         var widget = this;
-
         var onChange = function () {
             // Check for inputs with values
             if (!$(this).is('input, select')) {
@@ -74,7 +71,7 @@
     };
 
     AdvancedSearch.prototype.countChanges = function () {
-        var changeCount = $('input.changed, select.changed', this.$form).length;
+        var changeCount       = $('input.changed, select.changed', this.$form).length;
         var changeCountString = '';
 
         if (changeCount > 0) {
@@ -98,7 +95,7 @@
 
         // Add tab filter count to tab label
         $('.c-filter-group').each(function () {
-            var tabChangeCount = $('input.changed, select.changed', this).length;
+            var tabChangeCount   = $('input.changed, select.changed', this).length;
             var tabFilterCountEl = $('.c-filters-tab[data-tab="'+ $(this).data('tab') +'"] .tab-filter-count');
 
             tabFilterCountEl.attr('data-count', tabChangeCount);
@@ -131,7 +128,7 @@
      */
     AdvancedSearch.prototype.sort = function (e) {
         var optionEl = $(e.target).closest('.dropdown-item');
-        var label = $('.btn-label', optionEl).text();
+        var label    = $('.btn-label', optionEl).text();
 
         if ($(optionEl).hasClass('default')) {
             // Reset button to default sort
@@ -139,7 +136,7 @@
         } else {
             // Perform sort
             $(this.$sortBtn).addClass('selected').data({
-                property: optionEl.data('property'),
+                property:  optionEl.data('property'),
                 direction: optionEl.data('direction')
             });
             $('.sort-option', this.$sortBtn).find('.sort-option-value').text(label);
@@ -158,17 +155,17 @@
      * @param {string} value Filter value.
      */
     AdvancedSearch.prototype.filterObj = function (input, name, value) {
-        var formField = $(input).closest('.form-field');
+        var formField    = $(input).closest('.form-field');
         var dataOperator = formField.data('operator') || '';
 
-        this.name = name;
-        this.value = value;
+        this.name     = name;
+        this.value    = value;
         this.operator = '=';
-        this.type = input.type;
+        this.type     = input.type;
 
         this.parseInvalidBetween = function (name, value) {
-            this.type = 'date';
-            this.value = value;
+            this.type     = 'date';
+            this.value    = value;
             this.operator = name.endsWith("[from]") ? '>' : '<';
         };
 
@@ -182,12 +179,12 @@
         }
 
         if (this.type === 'select-multiple') {
-            this.value = $(input).val();
+            this.value    = $(input).val();
             this.operator = "IN";
         }
 
         if (name.endsWith("[from]") || name.endsWith("[to]")) {
-            this.type = 'daterange';
+            this.type     = 'daterange';
             this.operator = 'BETWEEN';
             this.matching = name.endsWith('[from]') ? name.replace('[from]', '[to]') : name.replace('[to]', '[from]');
 
@@ -242,13 +239,14 @@
      * @return {object|null} A search request object or NULL.
      */
     AdvancedSearch.prototype.prepare_request = function (p_filters) {
-        var request = null, filters = [], opts, data = this.opts('data');
-        var orderProperty = $(this.$sortBtn).data('property');
+        var request          = null, filters = [], opts;
+        var data             = this.opts('data');
+        var orderProperty    = $(this.$sortBtn).data('property');
         var collection_table = this.opts('collection_table');
 
         $.each(p_filters, function (key, filter_obj) {
-            var propName = filter_obj.name.replace(/(\[.*)/gi, '');
-            var filter_table = null;
+            var propName       = filter_obj.name.replace(/(\[.*)/gi, '');
+            var filter_table   = null;
             var value_override = [];
 
             opts = data.properties_options[propName] || {};
@@ -258,7 +256,6 @@
             }
 
             if (typeof filter_obj !== 'undefined') {
-
                 if (filter_obj.type === 'daterange') {
                     // Is daterange input
                     if (filter_obj.operator === 'BETWEEN' && filter_obj.name.endsWith('[to]')) {
@@ -286,7 +283,7 @@
 
         request = {
             filters: null,
-            orders: null,
+            orders:  null,
         };
 
         if (filters.length) {
@@ -299,8 +296,8 @@
         if ($(this.$sortBtn).hasClass('selected') && orderProperty) {
             request.orders = {
                 direction: $(this.$sortBtn).data('direction'),
-                mode: $(this.$sortBtn).data('direction'),
-                property: orderProperty
+                mode:      $(this.$sortBtn).data('direction'),
+                property:  orderProperty
             };
         }
 
@@ -342,7 +339,6 @@
         }
 
         widget.set_orders(orders);
-
         widget.reload();
 
         return this;

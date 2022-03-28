@@ -2,7 +2,6 @@
 
 namespace Charcoal\AdvancedSearch\Widget;
 
-use Generator;
 use Psr\Log\InvalidArgumentException;
 use Pimple\Container;
 use RuntimeException;
@@ -24,8 +23,6 @@ use Charcoal\Ui\Layout\LayoutAwareTrait;
 
 // from charcoal-loader
 use Charcoal\Loader\CollectionLoaderAwareTrait;
-use Charcoal\Translator\Translation;
-use Charcoal\Translator\Translator;
 
 /**
  * Class Abstract Advanced Search Widget
@@ -286,8 +283,8 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
             if ($property) {
                 $propertyLabel = $this->translator()->translate($property->getLabel());
                 $properties[] = [
-                    'property' => $sortOption,
-                    'label' => $propertyLabel,
+                    'property'  => $sortOption,
+                    'label'     => $propertyLabel,
                     'direction' => ($value['direction'] ?? 'ASC'),
                 ];
             }
