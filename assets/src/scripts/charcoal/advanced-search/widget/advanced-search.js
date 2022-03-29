@@ -21,10 +21,11 @@
     AdvancedSearch.prototype.parent      = Charcoal.Admin.Widget.prototype;
 
     AdvancedSearch.prototype.init = function () {
-        this.$form     = this.element();
-        this.$applyBtn = $('.js-filter-apply', this.$form);
-        this.$sortBtn  = $('.sort-dropdown', this.$form);
-        this.totalRows = 0;
+        this.$form             = this.element();
+        this.$applyBtn         = $('.js-filter-apply', this.$form);
+        this.$sortBtn          = $('.sort-dropdown', this.$form);
+        this.$activeFilterList = $('.active-filters', this.$form);
+        this.totalRows         = 0;
 
         this.$form.on('submit.charcoal.search.filter', function (e) {
             e.preventDefault();
@@ -57,18 +58,154 @@
         }
 
         var widget = this;
-        var onChange = function () {
-            // Check for inputs with values
-            if (!$(this).is('input, select')) {
-                $(this).find('input, select').addClass('changed');
-            } else {
-                $(this).addClass('changed');
+        var onChange = function (e) {
+            // Add item to active-filters list
+            var targetFilter  = e.target;
+            var filterWrapper = $(targetFilter).closest('fieldset');
+            var formField     = $(targetFilter).attr('id');
+            var filterName    = $('label', filterWrapper).first().text();
+            var filterVal     = $(targetFilter).val();
+            var filterType    = 'input';
+
+            // Date
+            if (typeof e.date !== 'undefined') {
+                var filterInput     = $('input', targetFilter).first();
+                var filterInputName = filterInput.attr('name');
+                formField           = filterInput.attr('id');
+
+                if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
+                    // Is a date range
+                    filterType = 'date-range';
+                    var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
+                    var dates = [
+                        $('input[name="'+ primaryName +'[from]"]').val() || null,
+                        $('input[name="'+ primaryName +'[to]"]').val()   || null
+                    ].filter(function (element) {
+                        return element !== null;
+                    });
+
+                    filterVal = dates.join(' - ');
+                } else {
+                    filterType = 'date';
+                    filterVal = filterInput.val();
+                }
             }
+
+            // Select
+            if (targetFilter.tagName === 'SELECT') {
+                filterType = 'select';
+                filterVal = Array.from(targetFilter.selectedOptions).map(function (option) {
+                    return option.value ? option.innerHTML : null;
+                })
+                .filter(function (element) {
+                    return element !== null;
+                })
+                .join(', ');
+            }
+
+            if (targetFilter.type === 'checkbox') {
+                filterType = 'checkbox';
+                filterVal = $(targetFilter).is(':checked') ? ($('html').attr('lang') === 'fr' ? 'Oui' : 'Yes') : '';
+            }
+
+            if (!filterVal.length) {
+                widget.removeActiveFilter(formField);
+                if (!$(this).is('input, select')) {
+                    $(this).find('.changed').removeClass('changed');
+                } else {
+                    $(this).removeClass('changed');
+                }
+            } else {
+                widget.updateActiveFilter(formField, filterName, filterVal, filterType);
+                // Check for inputs with values
+                if (!$(this).is('input, select')) {
+                    $(this).find('input, select').addClass('changed');
+                } else {
+                    $(this).addClass('changed');
+                }
+            }
+
             widget.countChanges();
         };
 
         $('input, select', this.$form).on('change', onChange);
         $('.datetimepickerinput', this.$form).on('change.datetimepicker', onChange);
+    };
+
+    /**
+     * Add Active Filter.
+     *
+     * @param {string} id Unique ID.
+     * @param {string} label Filter label.
+     * @param {string} value Filter value.
+     * @param {string} type The type of the filter.
+     */
+    AdvancedSearch.prototype.addActiveFilter = function (id, label, value, type) {
+        var listItem = $('<li></li>')
+            .append($('<span></span>').addClass('label').text(label).attr('title', label))
+            .append($('<span></span>').addClass('value').text(value).attr('title', value))
+            .append($('<div></div>').addClass('remove fa fa-times').on('click', this.removeActiveFilter.bind(this)))
+            .attr('data-key', id)
+            .attr('data-type', type);
+        $(this.$activeFilterList).append(listItem);
+    };
+
+    /**
+     * Update Active Filter.
+     *
+     * @param {string} filterId Unique ID.
+     * @param {string} label Filter label.
+     * @param {string} value Filter value.
+     * @param {string} [filterType] The type of the filter.
+     */
+    AdvancedSearch.prototype.updateActiveFilter = function (filterId, label, value, filterType) {
+        var filterIdClean = this.cleanFilterId(filterId);
+        var listItem = $('li[data-key="'+ filterIdClean +'"]', this.$activeFilterList);
+        var type = $(listItem).data('type') || filterType || 'input';
+
+        if (listItem.length) {
+            $(listItem).attr('data-type', type);
+            $('.label', listItem).text(label).attr('title', label);
+            $('.value', listItem).text(value).attr('title', value);
+        } else {
+            this.addActiveFilter(filterIdClean, label, value, type);
+        }
+    };
+
+    /**
+     * Clean filter ID of 'from'/'to'.
+     *
+     * @param {string} filterId
+     * @returns 
+     */
+    AdvancedSearch.prototype.cleanFilterId = function (filterId) {
+        var filterIdClean = filterId;
+
+        if (filterId.includes('from_input_') || filterId.includes('to_input_')) {
+            filterIdClean = filterIdClean.replace('from_', '').replace('to_', '');
+        }
+
+        return filterIdClean;
+    };
+
+    /**
+     * Remove item from active filter list.
+     *
+     * @param {event|string} e Remove Event or target string.
+     */
+    AdvancedSearch.prototype.removeActiveFilter = function (e) {
+        var target = e;
+
+        if (typeof target === 'string') {
+            target = this.cleanFilterId(target);
+            target = $('li[data-key="'+ target +'"]', this.$activeFilterList);
+        } else {
+            target = e.target;
+        }
+
+        var listItem = $(target).closest('li');
+        this.clearFilter(listItem);
+        listItem.remove();
     };
 
     AdvancedSearch.prototype.setTotalRows = function (totalRows) {
@@ -117,12 +254,20 @@
      * @return this
      */
     AdvancedSearch.prototype.clear = function () {
+        // Reset form
         this.$form[0].reset();
+        // Clear selects
         this.$form.find('select').selectpicker('refresh');
+        // Clear date pickers
         $('.datetimepickerinput').datetimepicker('clear');
+        // Set changed inputs to unchanged state
         $('input.changed, select.changed', this.$form).removeClass('changed');
+
         this.countChanges();
 
+        // Clear active filter list
+        $('li', this.$activeFilterList).remove();
+        // Reset sort dropdown
         $(this.$sortBtn).removeClass('selected');
 
         this.submit();
@@ -130,8 +275,69 @@
     };
 
     /**
-     * Change the widget sorting order
-     * 
+     * Resets a filter.
+     *
+     * @param {string} filterId Filter ID.
+     * @return this
+     */
+    AdvancedSearch.prototype.clearFilter = function (listItem) {
+        if (!$(listItem).length) {
+            return;
+        }
+
+        var filterId     = $(listItem).data('key');
+        var listItemType = $(listItem).data('type');
+        var filterInput, filterType;
+
+        if (listItemType.includes('date')) {
+            // Handle date pickers
+            if (listItemType === 'date-range') {
+                // Date Range
+                filterType  = 'date-range';
+                filterInput = $('#from_'+ filterId, this.$form);
+            } else {
+                // Single Date
+                filterType  = 'date';
+                filterInput = $('#'+ filterId, this.$form);
+            }
+        } else {
+            // Handle all inputs
+            filterInput = $('#'+ filterId, this.$form);
+            filterType  = filterInput[0].type;
+        }
+
+        // Reset respective input
+        switch (filterType) {
+            case 'checkbox':
+                filterInput.prop('checked', false);
+                break;
+
+            case 'select-one':
+            case 'select-multiple':
+                $(filterInput).val('');
+                $(filterInput).selectpicker('refresh');
+                break;
+
+            case 'date-range':
+                filterInput.closest('fieldset').find('.datetimepickerinput').datetimepicker('clear');
+                filterInput.closest('fieldset').find('.changed').removeClass('changed');
+                break;
+
+            default:
+                filterInput.val('');
+                break;
+        }
+
+        $(filterInput).removeClass('changed');
+        this.countChanges();
+
+        return this;
+    };
+
+    /**
+     * Change the widget sorting order.
+     *
+     * @param {object} e Event.
      * @return this
      */
     AdvancedSearch.prototype.sort = function (e) {
@@ -156,8 +362,8 @@
     };
 
     /**
-     * Filter object definition
-     * 
+     * Filter object definition.
+     *
      * @param {object} name Input dom object.
      * @param {string} name Filter name.
      * @param {string} value Filter value.
@@ -209,7 +415,7 @@
     };
 
     /**
-     * Submit the filters to all widgets
+     * Submit the filters to all widgets.
      *
      * @return this
      */
@@ -315,7 +521,7 @@
     };
 
     /**
-     * Dispatches the event to all widgets that can listen to it
+     * Dispatches the event to all widgets that can listen to it.
      *
      * @param  {object} request - The search request.
      * @param  {object} widget  - The widget to search on.

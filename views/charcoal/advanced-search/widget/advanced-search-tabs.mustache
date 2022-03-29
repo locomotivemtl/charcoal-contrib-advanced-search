@@ -1,17 +1,17 @@
 <form id="{{ widgetId }}" class="c-filters c-table-container mt-2 mt-xl-4" method="post" autocomplete="off">
-        <div class="row pb-2">
-            {{# label }}
-            <div class="col-6">
-                <div class="o-header -small">
-                    {{ . }}
-                </div>
-            </div>
-            {{/ label }}
-            <div class="col-6 filters-total-rows" data-count="{{ numTotal }}">
-                <span class="row-count">{{ numTotal }}</span>
-                <span class="row-count-label">{{# rowCountLabel }}{{ . }}{{/ rowCountLabel }}{{^ rowCountLabel }}{{#_t}}row-count-label{{/_t}}{{/ rowCountLabel }}</span><span class="plural">s</span>
+    <div class="row pb-2">
+        {{# label }}
+        <div class="col-6">
+            <div class="o-header -small">
+                {{ . }}
             </div>
         </div>
+        {{/ label }}
+        <div class="col-6 filters-total-rows" data-count="{{ numTotal }}">
+            <span class="row-count">{{ numTotal }}</span>
+            <span class="row-count-label">{{# rowCountLabel }}{{ . }}{{/ rowCountLabel }}{{^ rowCountLabel }}{{#_t}}row-count-label{{/_t}}{{/ rowCountLabel }}</span><span class="plural">s</span>
+        </div>
+    </div>
     <div class="row c-filters-tabs">
         <div class="col-md-10">
             {{# tabs }}
@@ -68,7 +68,12 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6">
+        <div class="col-12">
+            <ul class="active-filters"></ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
             <div class="pt-2 pt-sm-3">
                 <button class="btn btn-primary js-filter-apply" type="submit" disabled>
                     <i class="fa fa-filter"></i>
