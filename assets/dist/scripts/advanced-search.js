@@ -24,6 +24,7 @@
         this.$form     = this.element();
         this.$applyBtn = $('.js-filter-apply', this.$form);
         this.$sortBtn  = $('.sort-dropdown', this.$form);
+        this.totalRows = 0;
 
         this.$form.on('submit.charcoal.search.filter', function (e) {
             e.preventDefault();
@@ -68,6 +69,13 @@
 
         $('input, select', this.$form).on('change', onChange);
         $('.datetimepickerinput', this.$form).on('change.datetimepicker', onChange);
+    };
+
+    AdvancedSearch.prototype.setTotalRows = function (totalRows) {
+        this.totalRows = totalRows;
+        var totalRowsEl = $('.filters-total-rows').first();
+        totalRowsEl.find('.row-count').text(this.totalRows);
+        totalRowsEl.attr('data-count', this.totalRows);
     };
 
     AdvancedSearch.prototype.countChanges = function () {
@@ -338,8 +346,13 @@
             orders.push(request.orders);
         }
 
+        $(this.$form).addClass('loading');
+
         widget.set_orders(orders);
-        widget.reload();
+        widget.reload(function (response) {
+            $(this.$form).removeClass('loading');
+            this.setTotalRows(response.widget_data.total_rows);
+        }.bind(this), true);
 
         return this;
     };

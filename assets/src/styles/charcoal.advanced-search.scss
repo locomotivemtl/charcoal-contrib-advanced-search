@@ -88,6 +88,23 @@ div.no-filters {
 			}
 		}
 	}
+
+	.filters-total-rows {
+		font-size: 20px;
+    	padding-left: 15px;
+
+		.plural {
+			display: inline;
+		}
+		&[data-count="0"] {
+			display: none;
+		}
+		&[data-count="1"] {
+			.plural {
+				display: none;
+			}
+		}
+	}
 }
 
 .filter-group {
@@ -120,5 +137,16 @@ $switch-height-xs: calc(calc(1.5em + 1rem + #{$switch-thumb-padding}) * .6);
 		&:checked + label::after {
 			margin-left: $switch-height-xs;
 		}
+	}
+}
+
+.c-filters.loading {
+	.filters-total-rows {
+		opacity: 0.5;
+	}
+	.sort-dropdown,
+	.filter-group {
+		opacity: 0.5;
+		pointer-events: none;
 	}
 }

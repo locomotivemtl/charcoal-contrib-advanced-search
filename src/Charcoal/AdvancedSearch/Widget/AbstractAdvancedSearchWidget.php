@@ -53,6 +53,9 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     /** @var array $propertiesOptions */
     private $propertiesOptions = [];
 
+    /** @var string */
+    private $rowCountLabel;
+
     /**
      * @param Container $container DI Container.
      * @return void
@@ -502,5 +505,16 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
         }
 
         return $this->collectionTable;
+    }
+
+    public function setRowCountLabel($rowCountLabel)
+    {
+        $this->rowCountLabel = $rowCountLabel;
+        return $this;
+    }
+
+    public function rowCountLabel()
+    {
+        return $this->rowCountLabel;
     }
 }
