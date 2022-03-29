@@ -215,6 +215,11 @@
         totalRowsEl.attr('data-count', this.totalRows);
     };
 
+    /**
+     * Count all changed filters.
+     *
+     * @returns {int} Change count.
+     */
     AdvancedSearch.prototype.countChanges = function () {
         var changeCount       = $('input.changed, select.changed', this.$form).length;
         var changeCountString = '';
@@ -246,6 +251,8 @@
             tabFilterCountEl.attr('data-count', tabChangeCount);
             tabFilterCountEl.find('.count').text(tabChangeCount);
         });
+
+        return changeCount;
     };
 
     /**
@@ -329,7 +336,10 @@
         }
 
         $(filterInput).removeClass('changed');
-        this.countChanges();
+
+        if (!this.countChanges()) {
+            this.clear();
+        }
 
         return this;
     };
