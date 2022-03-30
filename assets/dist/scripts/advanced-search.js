@@ -173,6 +173,15 @@
     };
 
     /**
+     * Count total active filters.
+     * 
+     * @returns {int} Total active filters.
+     */
+    AdvancedSearch.prototype.countActiveFilters = function () {
+        return $('li', this.$activeFilterList).length;
+    };
+
+    /**
      * Clean filter ID of 'from'/'to'.
      *
      * @param {string} filterId
@@ -204,8 +213,16 @@
         }
 
         var listItem = $(target).closest('li');
-        this.clearFilter(listItem);
-        listItem.remove();
+
+        if (listItem.length) {
+            if (this.countActiveFilters() === 1) {
+                this.clear();
+                return;
+            }
+
+            this.clearFilter(listItem);
+            listItem.remove();
+        }
     };
 
     AdvancedSearch.prototype.setTotalRows = function (totalRows) {
@@ -336,10 +353,6 @@
         }
 
         $(filterInput).removeClass('changed');
-
-        if (!this.countChanges()) {
-            this.clear();
-        }
 
         return this;
     };
