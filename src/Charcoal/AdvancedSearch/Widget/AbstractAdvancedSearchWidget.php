@@ -44,17 +44,20 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     /** @var ModelInterface $proto */
     private $proto;
 
-    /** @var FactoryInterface */
+    /** @var FactoryInterface $widgetFactory */
     private $widgetFactory;
 
-    /** @var FactoryInterface */
+    /** @var FactoryInterface $PropertyInputFactory */
     private $PropertyInputFactory;
 
     /** @var array $propertiesOptions */
     private $propertiesOptions = [];
 
-    /** @var string */
+    /** @var string $rowCountLabel */
     private $rowCountLabel;
+
+    /** @var array $sortOptions */
+    private $sortOptionsGenerated;
 
     /**
      * @param Container $container DI Container.
@@ -137,7 +140,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     }
 
     /**
-     * @param array $data Optional. The form property data to set.
+     * @param  array|null  $data  Optional. The form property data to set.
      * @return FormPropertyWidget
      */
     public function createFormProperty(array $data = null)
@@ -181,7 +184,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
 
     private function setPropertyInputFactory(FactoryInterface $factory)
     {
-        $this->propertyInputFactory = $factory;
+        $this->PropertyInputFactory = $factory;
     }
 
     /**
@@ -192,14 +195,14 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
      */
     protected function propertyInputFactory()
     {
-        if ($this->propertyInputFactory === null) {
+        if ($this->PropertyInputFactory === null) {
             throw new RuntimeException(sprintf(
                 'Property Input Factory is not defined for "%s"',
                 get_class($this)
             ));
         }
 
-        return $this->propertyInputFactory;
+        return $this->PropertyInputFactory;
     }
 
     /**
@@ -331,7 +334,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
         if (empty($propertyMeta['choices']) && !empty($propertyMeta['choices_source'])) {
             $source = $propertyMeta['choices_source'];
             // Load choices from db
-            if ($source['type'] == 'property') {
+            if ($source['type'] === 'property') {
                 $model = $this->modelFactory()->create($source['model']);
                 $properties = iterator_to_array($model->properties());
                 $choices = $properties[$source['property_ident']]['choices'];
@@ -341,7 +344,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
                         yield $choice;
                     }
                 }
-            } elseif ($source['type'] == 'database') {
+            } elseif ($source['type'] === 'database') {
                 $model = $this->modelFactory()->create($source['model']);
                 $collection = $this->collectionLoader()->reset()->setModel($model);
                 $input = $this->propertyInputFactory()->create($propertyMeta['input_type']);
@@ -371,23 +374,31 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
      */
     public function sortOptions()
     {
-        $properties = [];
+        if (empty($this->sortOptionsGenerated)) {
+            $properties = [];
 
-        foreach ($this->sort as $key => $value) {
-            $sortOption = is_string($key) ? $key : $value;
-            $property = $this->proto()->p($sortOption);
+            foreach ($this->sortOptions as $key => $value) {
+                $sortOption = is_string($key) ? $key : $value;
+                $property = $this->proto()->p($sortOption);
 
-            if ($property) {
-                $propertyLabel = $this->translator()->translate($property->getLabel());
-                $properties[] = [
-                    'property'  => $sortOption,
-                    'label'     => $propertyLabel,
-                    'direction' => ($value['direction'] ?? 'ASC'),
-                ];
+                if ($property) {
+                    $propertyLabel = $this->translator()->translate($property->getLabel());
+                    $properties[] = [
+                        'property'  => $sortOption,
+                        'label'     => $propertyLabel,
+                        'direction' => ($value['direction'] ?? 'ASC'),
+                    ];
+                }
             }
+            $this->sortOptionsGenerated = $properties;
         }
 
-        return $properties;
+        return $this->sortOptionsGenerated;
+    }
+
+    public function hasSortOptions()
+    {
+        return !empty($this->sortOptions()) ? ['sortOptions' => $this->sortOptions()] : null;
     }
 
     // GETTERS AND SETTERS

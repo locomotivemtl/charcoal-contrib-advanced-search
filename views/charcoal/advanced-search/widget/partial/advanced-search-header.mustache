@@ -1,0 +1,13 @@
+<div class="row pb-2">
+	{{# label }}
+	<div class="col-6">
+		<div class="o-header -small">
+			{{ . }}
+		</div>
+	</div>
+	{{/ label }}
+	<div class="col-6 filters-total-rows" data-count="{{ numTotal }}">
+		<span class="row-count">{{ numTotal }}</span>
+		<span class="row-count-label">{{# rowCountLabel }}{{ . }}{{/ rowCountLabel }}{{^ rowCountLabel }}{{#_t}}row-count-label{{/_t}}{{/ rowCountLabel }}</span><span class="plural">s</span>
+	</div>
+</div>

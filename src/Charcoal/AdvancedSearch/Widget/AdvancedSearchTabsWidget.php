@@ -9,17 +9,10 @@ use Pimple\Container;
  */
 class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
 {
+    /** @var array $tabs */
     private $tabs;
+    /** @var array $tabsWithFilters */
     private $tabsWithFilters = [];
-
-    /**
-     * @param Container $container DI Container.
-     * @return void
-     */
-    public function setDependencies(Container $container)
-    {
-        parent::setDependencies($container);
-    }
 
     /**
      * @return string

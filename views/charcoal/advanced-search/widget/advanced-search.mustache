@@ -1,41 +1,10 @@
 <form id="{{ widgetId }}" class="c-filters c-table-container mt-2 mt-xl-4" method="post" autocomplete="off">
-    <div class="row pb-2">
-        {{# label }}
-        <div class="col-6">
-            <div class="o-header -small">
-                {{ . }}
-            </div>
-        </div>
-        {{/ label }}
-        <div class="col-6 filters-total-rows" data-count="{{ numTotal }}">
-            <span class="row-count">{{ numTotal }}</span>
-            <span class="row-count-label">{{# rowCountLabel }}{{ . }}{{/ rowCountLabel }}{{^ rowCountLabel }}{{#_t}}row-count-label{{/_t}}{{/ rowCountLabel }}</span><span class="plural">s</span>
-        </div>
-    </div>
+
+    {{> charcoal/advanced-search/widget/partial/advanced-search-header }}
+
     <div class="row c-filters-tabs">
         <div class="col-md-12 text-right p-2">
-            <button class="sort-dropdown btn btn-light btn-outline-secondary dropdown-toggle dropdown-toggle-split" type="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-            >
-                <span class="btn-label">{{#_t}}sort_by{{/_t}}</span>
-                <div class="sort-option">
-                    : <span class="sort-option-value">None</span>
-                </div>
-            </button>
-
-            <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item btn default" data-property="{{ property }}" data-direction="{{ direction }}">
-                    <span class="btn-label">-- {{#_t}}default_sort{{/_t}} --</span>
-                </a>
-                {{# sortOptions }}
-                    <a class="dropdown-item btn" data-property="{{ property }}" data-direction="{{ direction }}">
-                        <span class="btn-label">{{ label }}</span>
-                    </a>
-                {{/ sortOptions }}
-            </div>
-
+            {{> charcoal/advanced-search/widget/partial/sort }}
         </div>
     </div>
     <div class="o-flex align-items-center">
@@ -43,7 +12,7 @@
             <fieldset>
                 <div class="c-filter-group active">
                     {{# groupsWithFilters }}
-                        {{> charcoal/advanced-search/widget/filter-group }}
+                        {{> charcoal/advanced-search/widget/partial/filter-group }}
                     {{/ groupsWithFilters }}
                     {{^ groupsWithFilters }}
                         <div class="no-filters">{{#_t}}No filters{{/_t}}.</div>
@@ -52,41 +21,9 @@
             </fieldset>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <ul class="active-filters"></ul>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="pt-2 pt-sm-3">
-                <button class="btn btn-primary js-filter-apply" type="submit" disabled>
-                    <i class="fa fa-filter"></i>
-                    <div class="btn-label">
-                        <span class="btn-label-singular">{{#_t}}Apply Filter{{/_t}}</span>
-                        <span class="btn-label-plural active">{{#_t}}Apply Filters{{/_t}}</span>
-                        <span class="filter-apply-count"></span>
-                    </div>
-                </button>
-                <button class="btn js-filter-reset" type="reset" disabled>
-                    <i class="fa fa-undo"></i>
-                    <span class="btn-label text-">{{#_t}}Reset all{{/_t}}</span>
-                </button>
-            </div>
-        </div>
-    </div>
+
+    {{> charcoal/advanced-search/widget/partial/advanced-search-footer }}
+
 </form>
 
-{{ assets.enqueue.js.advanced_search_js }}
-{{ assets.enqueue.css.advanced_search_css }}
-{{# assets.inject.js }}
-    Charcoal.Admin.manager().add_widget({
-        id:   '{{ widgetId }}',
-        obj_type: '{{ objType }}',
-        collection_ident: '{{ collectionIdent }}',
-        collection_table: '{{ collectionTable }}',
-        type: '{{ type }}',
-        widget_type: '{{ type }}',
-        data: {{& widgetDataForJsAsJson }}
-    });
-{{/ assets.inject.js }}
+{{> charcoal/advanced-search/widget/partial/assets }}

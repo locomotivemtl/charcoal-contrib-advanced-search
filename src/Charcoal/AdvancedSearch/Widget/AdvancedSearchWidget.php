@@ -14,15 +14,6 @@ class AdvancedSearchWidget extends AbstractAdvancedSearchWidget
     private $groupsWithFilters = [];
 
     /**
-     * @param Container $container DI Container.
-     * @return void
-     */
-    public function setDependencies(Container $container)
-    {
-        parent::setDependencies($container);
-    }
-
-    /**
      * @return string
      */
     public function type()
