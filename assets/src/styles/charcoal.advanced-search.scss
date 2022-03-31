@@ -137,6 +137,11 @@ $switch-height-xs: calc(calc(1.5em + 1rem + #{$switch-thumb-padding}) * .6);
 		&:checked + label::after {
 			margin-left: $switch-height-xs;
 		}
+
+		&:focus + label::before {
+			outline: 0;
+			box-shadow: 0 0 0 1px rgba(152, 185, 249, 75%);
+		}
 	}
 }
 
