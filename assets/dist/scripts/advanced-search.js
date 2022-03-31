@@ -26,6 +26,7 @@
         this.$sortBtn          = $('.sort-dropdown', this.$form);
         this.$activeFilterList = $('.active-filters', this.$form);
         this.totalRows         = 0;
+        this.isReloading       = false;
 
         this.$form.on('submit.charcoal.search.filter', function (e) {
             e.preventDefault();
@@ -551,11 +552,7 @@
      * @return this
      */
     AdvancedSearch.prototype.dispatch = function (request, widget) {
-        if (!widget) {
-            return this;
-        }
-
-        if (typeof widget.set_filters !== 'function') {
+        if (this.isReloading || !widget || typeof widget.set_filters !== 'function') {
             return this;
         }
 
@@ -576,11 +573,13 @@
         }
 
         $(this.$form).addClass('loading');
+        this.isReloading = true;
 
         widget.set_orders(orders);
         widget.reload(function (response) {
             $(this.$form).removeClass('loading');
             this.setTotalRows(response.widget_data.total_rows);
+            this.isReloading = false;
         }.bind(this), true);
 
         return this;
