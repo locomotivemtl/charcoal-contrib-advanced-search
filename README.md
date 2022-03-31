@@ -7,7 +7,7 @@ Charcoal Advanced Search
 [![Coverage Status][badge-coveralls]][dev-coveralls]
 [![Build Status][badge-travis]][dev-travis]
 
-A [Charcoal][charcoal-app] service provider my cool feature.
+A [Charcoal][charcoal-app] widget for creating tabbed filter interfaces.
 
 
 
@@ -17,7 +17,6 @@ A [Charcoal][charcoal-app] service provider my cool feature.
     -   [Dependencies](#dependencies)
 -   [Configuration](#configuration)
 -   [Usage](#usage)
--   [Options](#options)
 -   [Development](#development)
     -  [Assets](#assets)
     -  [API Documentation](#api-documentation)
@@ -64,48 +63,174 @@ No need for metadata/views/action/routes path etc.
 ## Usage
 
 [charcoal-contrib-advanced-search] can be used as a dashboard widget to filter all the filterable widgets
-included in the template. Define a structure like this one :point_down: in a dashboard widget to create filters.
+included in the template. Define a structure like these ones :point_down: in a dashboard widget to create filters.
 
+### Basic Structure
+#### With Tabs
 ```Json
 {
-    "filters": {
-        "type": "charcoal/advanced-search/widget/advanced-search",
-        "search_filters": [
-            "taxonomy_1",
-            "taxonomy_2",
-            "taxonomy_3"
-        ],
-        "properties_options": {
-            "taxonomy_1": {
-                "required": false,
-                "multiple": true,
-                "input_type": "charcoal/admin/search/input/select"
-            },
-            "taxonomy_2": {
-                "required": false,
-                "input_type": "charcoal/admin/search/input/radio"
-            },
-            "taxonomy_3": {
-                "required": false,
-                "input_type": "charcoal/admin/search/input/checkbox"
-            }
+    "advancedSearchNew": {
+        "type": "charcoal/advanced-search/widget/advanced-search-tabs",
+        "rowCountLabel": "Result",
+        "sort_options": {
+            "id": { "direction": "ASC" },
+            "name": { "direction": "ASC" },
+            "registrationDate": { "direction": "DESC" }
         },
-        "layout": {
-            "structure": [
-                {"columns": [1, 1, 1]}
-            ]
-        }
+        "tabs": [
+            {},
+            {}
+        ]
+    },
+    "table": {
+        "obj_type": "path/to/model",
+        "type": "charcoal/admin/widget/table",
+        "show_table_header": false
     }
 }
 ```
 
-## Options
+#### Options
+| Key               | Values | Default  | Description                                                   |
+|:------------------|:------:|:--------:|---------------------------------------------------------------|
+| `row_count_label` | String | "Result" | Non-plural label to use for the heading count. ex. "User" will display as "24 Users" |
+| `sort_options`    | Array  |   n/a    | (optional) Defines sorting options                                       |
+| `tabs`          | Array  |   n/a    | Defines filter [tabs](#tab-example) to use         |
 
+#### Without Tabs
+If tabs aren't needed, the widget type `charcoal/advanced-search/widget/advanced-search` can be used.
+
+Instead of a `"filters": []` array, use a `"groups": []` array.
+```Json
+{
+    "advancedSearchNew": {
+        "type": "charcoal/advanced-search/widget/advanced-search",
+        "rowCountLabel": "Result",
+        "sort_options": {
+            "id": { "direction": "ASC" },
+            "name": { "direction": "ASC" },
+            "registrationDate": { "direction": "DESC" }
+        },
+        "groups": [
+            {},
+            {}
+        ]
+    },
+    "table": {
+        "obj_type": "path/to/model",
+        "type": "charcoal/admin/widget/table",
+        "show_table_header": false
+    }
+}
+```
+
+#### Options
+| Key               | Values | Default  | Description                                                   |
+|:------------------|:------:|:--------:|---------------------------------------------------------------|
+| `row_count_label` | String | "Result" | Non-plural label to use for the heading count. ex. "24 Users" |
+| `sort_options`    | Array  |   n/a    | Defines sorting options                                       |
+| `groups`          | Array  |   n/a    | Defines filter [groups](#filter-group-example) to use         |
+
+
+### Tabs
+#### Tab Example
+```JSON
+{
+    "label": "First Tab",
+    "groups": [
+        {},
+        {}
+    ],
+    "layout": {}
+}
+```
+#### Options
 | Key                  | Values | Default | Description                                                |
-| :---                 | :---:  | :---:   | ---                                                        |
-| `properties`         | Array  | n/a     | Defines which of the model's properties to use as filters. |
-| `properties_options` | Array  | n/a     | Defines search customizations for the filter inputs      |
-| `layout`             | Array  | n/a     | Arrange the filters in a layout using structures           |
+|:---------------------|:------:|:-------:|------------------------------------------------------------|
+| `label` | String | n/a | Label to use for the tab |
+| `groups`          | Array  |   n/a    | Defines filter [groups](#filter-group-example) to use         |
+| `layout`             | Array  |   n/a   | Arrange the groups in a layout within the tab using structures           |
+
+### Filter Group
+#### Filter Group Example
+```JSON
+{
+    "label": "Filter Group Label",
+    "filters": [
+        "filter_one",
+        "filter_two"
+    ],
+    "filters_options": {
+        "filter_one": {},
+        "filter_two": {},
+    },
+    "layout": {}
+}
+```
+#### Options
+| Key                  | Values | Default | Description                                                |
+|:---------------------|:------:|:-------:|------------------------------------------------------------|
+| `label` | String | n/a | Label to use for the group |
+| `filters`          | Array  |   n/a    | Defines filters to use in order         |
+| `filters_options`          | Array  |   n/a    | Defines options for each [filter](#filter-examples) to use         |
+| `layout`             | Array  |   n/a   | Arrange the filters in a layout within the group using structures           |
+
+## Filter Examples
+Filters can be defined like normal inputs. However, there are added options for select inputs.
+### Select Inputs
+#### Use property choices as source
+```JSON
+{
+    "label": "Filter Label",
+    "input_type": "charcoal/admin/property/input/select",
+    "property_ident": "ident",
+    "choices_source": {
+        "type": "property",
+        "model": "path/to/model",
+        "property_ident": "ident"
+    },
+    "operator": "="
+}
+```
+#### Use database values as source
+```JSON
+{
+    "label": "Author Filter",
+    "multiple": false,
+    "input_type": "charcoal/admin/property/input/select",
+    "property_ident": "authors",
+    "choice_obj_map": {
+        "label": "displayName"
+    },
+    "choices_source": {
+        "type": "database",
+        "model": "charcoal/admin/user",
+        "filters": [
+            {
+                "property": "roles",
+                "value": "author"
+            }
+        ]
+    },
+    "select_options": {
+        "liveSearch": true,
+        "size": 5
+    }
+}
+```
+
+#### Options
+These options are added in addition to all other input options.
+| Key                  | Values | Default | Description                                                |
+|:---------------------|:------:|:-------:|------------------------------------------------------------|
+| `choice_obj_map`         | Array  |   n/a   | Maps a database column to the Label/Value of a select option |
+
+`choices_source`
+| Key                  | Values | Default | Description                                                |
+|:---------------------|:------:|:-------:|------------------------------------------------------------|
+| `type`         | String  |   n/a   | Either `property` (Use a model's property as choices) or `database` (Use database results as choices).  |
+| `model` | String  |   n/a   | Defines which model to use as a source        |
+| `filters` | Array  |   n/a   | `database` type only. Defines optional query filters        |
 
 
 
