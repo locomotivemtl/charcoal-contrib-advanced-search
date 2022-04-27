@@ -1,9 +1,21 @@
 <form id="{{ widgetId }}" class="c-filters c-table-container mt-2 mt-xl-4" method="post" autocomplete="off">
 
-    {{> charcoal/advanced-search/widget/partial/advanced-search-header }}
+    <div class="row pb-2">
+        {{# label }}
+        <div class="col-6">
+            <div class="o-header -small">
+                {{ . }}
+            </div>
+        </div>
+        {{/ label }}
+        <div class="col-6 filters-total-rows" data-count="{{ numTotal }}">
+            <span class="row-count">{{ numTotal }}</span>
+            <span class="row-count-label">{{# rowCountLabel }}{{ . }}{{/ rowCountLabel }}{{^ rowCountLabel }}{{#_t}}row-count-label{{/_t}}{{/ rowCountLabel }}</span><span class="plural">s</span>
+        </div>
+    </div>
 
     <div class="row c-filters-tabs">
-        <div class="col-md-10">
+        <div class="col-10">
             {{# tabs }}
                 <div class="c-filters-tab p-2" data-tab="{{ tab_key }}">
                     <button class="btn btn-light btn-outline-secondary" type="button">
@@ -16,7 +28,7 @@
                 </div>
             {{/ tabs }}
         </div>
-        <div class="col-md-2 text-right p-2">
+        <div class="col-2 text-right p-2">
             {{> charcoal/advanced-search/widget/partial/sort }}
         </div>
     </div>

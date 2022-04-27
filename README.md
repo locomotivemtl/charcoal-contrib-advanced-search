@@ -91,11 +91,11 @@ included in the template. Define a structure like these ones :point_down: in a d
 ```
 
 #### Options
-| Key               | Values | Default  | Description                                                   |
-|:------------------|:------:|:--------:|---------------------------------------------------------------|
+| Key               | Values | Default  | Description                                                                          |
+|:------------------|:------:|:--------:|--------------------------------------------------------------------------------------|
 | `row_count_label` | String | "Result" | Non-plural label to use for the heading count. ex. "User" will display as "24 Users" |
-| `sort_options`    | Array  |   n/a    | (optional) Defines sorting options                                       |
-| `tabs`          | Array  |   n/a    | Defines filter [tabs](#tab-example) to use         |
+| `sort_options`    | Array  |   n/a    | (optional) Defines sorting options                                                   |
+| `tabs`            | Array  |   n/a    | Defines filter [tabs](#tab-example) to use                                           |
 
 #### Without Tabs
 If tabs aren't needed, the widget type `charcoal/advanced-search/widget/advanced-search` can be used.
@@ -145,11 +145,11 @@ Instead of a `"filters": []` array, use a `"groups": []` array.
 }
 ```
 #### Options
-| Key                  | Values | Default | Description                                                |
-|:---------------------|:------:|:-------:|------------------------------------------------------------|
-| `label` | String | n/a | Label to use for the tab |
-| `groups`          | Array  |   n/a    | Defines filter [groups](#filter-group-example) to use         |
-| `layout`             | Array  |   n/a   | Arrange the groups in a layout within the tab using structures           |
+| Key      | Values | Default | Description                                                    |
+|:---------|:------:|:-------:|----------------------------------------------------------------|
+| `label`  | String |   n/a   | Label to use for the tab                                       |
+| `groups` | Array  |   n/a   | Defines filter [groups](#filter-group-example) to use          |
+| `layout` | Array  |   n/a   | Arrange the groups in a layout within the tab using structures |
 
 ### Filter Group
 #### Filter Group Example
@@ -168,12 +168,12 @@ Instead of a `"filters": []` array, use a `"groups": []` array.
 }
 ```
 #### Options
-| Key                  | Values | Default | Description                                                |
-|:---------------------|:------:|:-------:|------------------------------------------------------------|
-| `label` | String | n/a | Label to use for the group |
-| `filters`          | Array  |   n/a    | Defines filters to use in order         |
-| `filters_options`          | Array  |   n/a    | Defines options for each [filter](#filter-examples) to use         |
-| `layout`             | Array  |   n/a   | Arrange the filters in a layout within the group using structures           |
+| Key               | Values | Default | Description                                                       |
+|:------------------|:------:|:-------:|-------------------------------------------------------------------|
+| `label`           | String |   n/a   | Label to use for the group                                        |
+| `filters`         | Array  |   n/a   | Defines filters to use in order                                   |
+| `filters_options` | Array  |   n/a   | Defines options for each [filter](#filter-examples) to use        |
+| `layout`          | Array  |   n/a   | Arrange the filters in a layout within the group using structures |
 
 ## Filter Examples
 Filters can be defined like normal inputs. However, there are added options for select inputs.
@@ -221,16 +221,16 @@ Filters can be defined like normal inputs. However, there are added options for 
 
 #### Options
 These options are added in addition to all other input options.
-| Key                  | Values | Default | Description                                                |
-|:---------------------|:------:|:-------:|------------------------------------------------------------|
-| `choice_obj_map`         | Array  |   n/a   | Maps a database column to the Label/Value of a select option |
+| Key              | Values | Default | Description                                                  |
+|:-----------------|:------:|:-------:|--------------------------------------------------------------|
+| `choice_obj_map` | Array  |   n/a   | Maps a database column to the Label/Value of a select option |
 
 `choices_source`
-| Key                  | Values | Default | Description                                                |
-|:---------------------|:------:|:-------:|------------------------------------------------------------|
-| `type`         | String  |   n/a   | Either `property` (Use a model's property as choices) or `database` (Use database results as choices).  |
-| `model` | String  |   n/a   | Defines which model to use as a source        |
-| `filters` | Array  |   n/a   | `database` type only. Defines optional query filters        |
+| Key       | Values | Default | Description                                                                                            |
+|:----------|:------:|:-------:|--------------------------------------------------------------------------------------------------------|
+| `type`    | String |   n/a   | Either `property` (Use a model's property as choices) or `database` (Use database results as choices). |
+| `model`   | String |   n/a   | Defines which model to use as a source                                                                 |
+| `filters` | Array  |   n/a   | `database` type only. Defines optional query filters                                                   |
 
 
 

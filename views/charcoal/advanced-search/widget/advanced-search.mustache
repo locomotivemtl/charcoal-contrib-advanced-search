@@ -1,9 +1,20 @@
 <form id="{{ widgetId }}" class="c-filters c-table-container mt-2 mt-xl-4" method="post" autocomplete="off">
 
-    {{> charcoal/advanced-search/widget/partial/advanced-search-header }}
+    {{# label }}
+    <div class="row pb-2">
+        <div class="col-6">
+            <div class="o-header -small">
+                {{ . }}
+            </div>
+        </div>
+    </div>
+    {{/ label }}
 
     <div class="row c-filters-tabs">
-        <div class="col-md-12 text-right p-2">
+        <div class="col-6 p-2">
+            {{> charcoal/advanced-search/widget/partial/row-count }}
+        </div>
+        <div class="col-6 text-right p-2">
             {{> charcoal/advanced-search/widget/partial/sort }}
         </div>
     </div>
