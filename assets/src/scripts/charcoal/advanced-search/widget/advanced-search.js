@@ -411,6 +411,11 @@
             this.operator = dataOperator;
         }
 
+        // text field
+        if (this.type === 'text' && this.operator === 'LIKE') {
+            this.value = '%' + this.value + '%';
+        }
+
         // switch checkbox
         if (this.type === 'checkbox') {
             this.value = input.checked;
@@ -576,9 +581,12 @@
         this.isReloading = true;
 
         widget.set_orders(orders);
+
         widget.reload(function (response) {
+            if (response) {
+                this.setTotalRows(response.widget_data.total_rows);
+            }
             $(this.$form).removeClass('loading');
-            this.setTotalRows(response.widget_data.total_rows);
             this.isReloading = false;
         }.bind(this), true);
 
