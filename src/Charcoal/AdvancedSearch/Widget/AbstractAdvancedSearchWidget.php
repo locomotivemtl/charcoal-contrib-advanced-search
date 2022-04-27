@@ -311,6 +311,18 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
             $propertyMetadata['property_type'] = $propertyMetadata['input_type'];
             $prop->setData($propertyMetadata);
 
+            if (!empty($options[$propertyIdent]['table'])) {
+                $table = $options[$propertyIdent]['table'];
+
+                // If table is a resolvable model
+                if ($this->modelFactory()->isResolvable($table)) {
+                    $table = ($this->modelFactory()->create($table)->source()->table() ?? $table);
+                    $options[$propertyIdent]['table'] = $table;
+                }
+
+                $prop->mergePropertyData(['table' => $table]);
+            }
+
             if (!empty($options[$propertyIdent])) {
                 $propertyOptions = $options[$propertyIdent];
 
@@ -520,7 +532,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
 
     public function setRowCountLabel($rowCountLabel)
     {
-        $this->rowCountLabel = $rowCountLabel;
+        $this->rowCountLabel = $this->translator()->translate($rowCountLabel);
         return $this;
     }
 

@@ -47,7 +47,7 @@ $ composer require locomotivemtl/charcoal-contrib-advanced-search
 
 ## Configuration
 
-Include the advanced-search module in the projects's config file.
+Include the advanced-search module in the project's config file.
 This will provide everything needed for [charcoal-contrib-advanced-search] to work properly.
 No need for metadata/views/action/routes path etc.
 
@@ -162,7 +162,7 @@ Instead of a `"filters": []` array, use a `"groups": []` array.
     ],
     "filters_options": {
         "filter_one": {},
-        "filter_two": {},
+        "filter_two": {}
     },
     "layout": {}
 }
@@ -221,18 +221,22 @@ Filters can be defined like normal inputs. However, there are added options for 
 
 #### Options
 These options are added in addition to all other input options.
-| Key              | Values | Default | Description                                                  |
-|:-----------------|:------:|:-------:|--------------------------------------------------------------|
-| `choice_obj_map` | Array  |   n/a   | Maps a database column to the Label/Value of a select option |
 
-`choices_source`
-| Key       | Values | Default | Description                                                                                            |
-|:----------|:------:|:-------:|--------------------------------------------------------------------------------------------------------|
-| `type`    | String |   n/a   | Either `property` (Use a model's property as choices) or `database` (Use database results as choices). |
-| `model`   | String |   n/a   | Defines which model to use as a source                                                                 |
-| `filters` | Array  |   n/a   | `database` type only. Defines optional query filters                                                   |
+| Key              | Values |        Default         | Description                                                  |
+|:-----------------|:------:|:----------------------:|--------------------------------------------------------------|
+| `table`          | String | `choices_source.table` | Can be a `model` or a table name                             |
+| `property_ident` | String |          n/a           | Property name to filter by                                   |
+| `choice_obj_map` | Array  |          n/a           | Maps a database column to the Label/Value of a select option |
+| `choices_source` | Array  |          n/a           | See table below for choices_source options                   |
 
+`choices_source` options:
 
+| Key              | Values | Default | Description                                                                                            |
+|:-----------------|:------:|:-------:|--------------------------------------------------------------------------------------------------------|
+| `type`           | String |   n/a   | Either `property` (Use a model's property as choices) or `database` (Use database results as choices). |
+| `model`          | String |   n/a   | Defines which model to use as a source                                                                 |
+| `filters`        | Array  |   n/a   | `database` type only. Defines optional query filters                                                   |
+| `property_ident` | String |   n/a   | `property` type only. Property name to use as select options                                           |
 
 
 ## Development
