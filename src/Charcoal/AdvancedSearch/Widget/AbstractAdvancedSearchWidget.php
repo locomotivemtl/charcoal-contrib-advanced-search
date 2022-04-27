@@ -50,6 +50,9 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     /** @var FactoryInterface $PropertyInputFactory */
     private $PropertyInputFactory;
 
+    /** @var FactoryInterface $propertyFactory */
+    private $propertyFactory;
+
     /** @var array $propertiesOptions */
     private $propertiesOptions = [];
 
@@ -77,6 +80,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
         $this->setModelFactory($container['model/factory']);
         $this->setCollectionLoader($container['model/collection/loader']);
         $this->setPropertyInputFactory($container['property/input/factory']);
+        $this->propertyFactory = $container['property/factory'];
     }
 
     /**
@@ -289,11 +293,11 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
      */
     public function processFilters(array $filters, array $options = [])
     {
-        foreach ($filters as $propertyIdent => $propertyMetadata) {
+        foreach ($filters as $propertyKey => $propertyMetadata) {
             if (is_string($propertyMetadata)) {
-                $propertyIdent = $propertyMetadata;
-                $propertyMetadata = $options[$propertyIdent] ?? [];
-                $filters[$propertyIdent] = $propertyMetadata;
+                $propertyKey = $propertyMetadata;
+                $propertyMetadata = $options[$propertyKey] ?? [];
+                $filters[$propertyKey] = $propertyMetadata;
             }
 
             if (!empty($propertyMetadata['choices_source'])) {
@@ -307,31 +311,38 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
             }
 
             $prop = $this->createFormProperty();
-            $prop->setPropertyIdent($propertyIdent);
             $propertyMetadata['property_type'] = $propertyMetadata['input_type'];
             $prop->setData($propertyMetadata);
 
-            if (!empty($options[$propertyIdent]['table'])) {
-                $table = $options[$propertyIdent]['table'];
+            $propertyIdent = $propertyMetadata['property_type'] ?? $propertyIdent ?? $propertyKey;
+            if ($propertyIdent && $this->propertyFactory->isResolvable($propertyIdent)) {
+                $prop->setProperty($this->propertyFactory->create($propertyIdent));
+                $prop->mergePropertyData(['ident' => $propertyIdent]);
+            }
+
+            $prop->setPropertyIdent($propertyIdent);
+
+            if (!empty($options[$propertyKey]['table'])) {
+                $table = $options[$propertyKey]['table'];
 
                 // If table is a resolvable model
                 if ($this->modelFactory()->isResolvable($table)) {
                     $table = ($this->modelFactory()->create($table)->source()->table() ?? $table);
-                    $options[$propertyIdent]['table'] = $table;
+                    $options[$propertyKey]['table'] = $table;
                 }
 
                 $prop->mergePropertyData(['table' => $table]);
             }
 
-            if (!empty($options[$propertyIdent])) {
-                $propertyOptions = $options[$propertyIdent];
+            if (!empty($options[$propertyKey])) {
+                $propertyOptions = $options[$propertyKey];
 
                 if (is_array($propertyOptions)) {
                     $prop->mergePropertyData($propertyOptions);
                 }
             }
 
-            yield $propertyIdent => $prop;
+            yield $propertyKey => $prop;
         }
     }
 
@@ -351,11 +362,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
                 $properties = iterator_to_array($model->properties());
                 $choices = $properties[$source['property_ident']]['choices'];
 
-                if (is_array($choices)) {
-                    foreach ($choices as $choice) {
-                        yield $choice;
-                    }
-                }
+                return is_array($choices) ? $choices : [];
             } elseif ($source['type'] === 'database') {
                 $model = $this->modelFactory()->create($source['model']);
                 $collection = $this->collectionLoader()->reset()->setModel($model);
@@ -372,9 +379,14 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
                 }
 
                 $modelCollection = $collection->load();
-                foreach ($modelCollection as $item) {
-                    yield $input->mapObjToChoice($item);
-                }
+
+                $choices = array_map(function ($item) use ($input) {
+                    return $input->mapObjToChoice($item);
+                }, $modelCollection->values());
+
+                return $choices;
+            } else {
+                return [];
             }
         }
     }

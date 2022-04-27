@@ -226,6 +226,7 @@ These options are added in addition to all other input options.
 |:-----------------|:------:|:----------------------:|--------------------------------------------------------------|
 | `table`          | String | `choices_source.table` | Can be a `model` or a table name                             |
 | `property_ident` | String |          n/a           | Property name to filter by                                   |
+| `property_type`  | String |    `property_ident`    | The type of property to use.                                 |
 | `choice_obj_map` | Array  |          n/a           | Maps a database column to the Label/Value of a select option |
 | `choices_source` | Array  |          n/a           | See table below for choices_source options                   |
 
