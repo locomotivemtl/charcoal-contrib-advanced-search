@@ -37,7 +37,11 @@
         this.$form.on('click.charcoal.search.filter', '.js-filter-reset', this.clear.bind(this));
 
         // Handle change sorting
-        this.$form.on('click', '.sort-dropdown + .dropdown-menu>.dropdown-item', this.sort.bind(this));
+        this.$form.on(
+            'click.charcoal.search.filter',
+            '.sort-dropdown + .dropdown-menu>.dropdown-item',
+            this.sort.bind(this)
+        );
 
         $('.c-filters-tab').on('click', function() {
             var tab_key = $(this).attr('data-tab');
@@ -258,7 +262,7 @@
             $('.btn-label-plural', this.$applyBtn).addClass('active');
         }
 
-        // Apppend change count to apply button
+        // Append change count to apply button
         $('.filter-apply-count', this.$applyBtn).text(changeCountString);
 
         // Add tab filter count to tab label

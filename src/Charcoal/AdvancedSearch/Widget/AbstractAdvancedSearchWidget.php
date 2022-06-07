@@ -59,6 +59,9 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     /** @var string $rowCountLabel */
     private $rowCountLabel;
 
+    /** @var string $rowCountLabelPlural */
+    private $rowCountLabelPlural;
+
     /** @var array $sortOptions */
     private $sortOptionsGenerated;
 
@@ -551,5 +554,16 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
     public function rowCountLabel()
     {
         return $this->rowCountLabel;
+    }
+
+    public function setRowCountLabelPlural($rowCountLabelPlural)
+    {
+        $this->rowCountLabelPlural = $this->translator()->translate($rowCountLabelPlural);
+        return $this;
+    }
+
+    public function rowCountLabelPlural()
+    {
+        return $this->rowCountLabelPlural;
     }
 }

@@ -98,14 +98,20 @@ div.no-filters {
 		font-size: 20px;
     	padding-left: 15px;
 
-		.plural {
+		.row-count-label {
+			display: none;
+		}
+		.row-count-label-plural {
 			display: inline;
 		}
 		&[data-count="0"] {
 			display: none;
 		}
 		&[data-count="1"] {
-			.plural {
+			.row-count-label {
+				display: inline;
+			}
+			.row-count-label-plural {
 				display: none;
 			}
 		}

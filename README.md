@@ -72,6 +72,7 @@ included in the template. Define a structure like these ones :point_down: in a d
     "advancedSearchNew": {
         "type": "charcoal/advanced-search/widget/advanced-search-tabs",
         "rowCountLabel": "Result",
+        "rowCountLabelPlural": "Results",
         "sort_options": {
             "id": { "direction": "ASC" },
             "name": { "direction": "ASC" },
@@ -91,11 +92,12 @@ included in the template. Define a structure like these ones :point_down: in a d
 ```
 
 #### Options
-| Key               | Values | Default  | Description                                                                          |
-|:------------------|:------:|:--------:|--------------------------------------------------------------------------------------|
-| `row_count_label` | String | "Result" | Non-plural label to use for the heading count. ex. "User" will display as "24 Users" |
-| `sort_options`    | Array  |   n/a    | (optional) Defines sorting options                                                   |
-| `tabs`            | Array  |   n/a    | Defines filter [tabs](#tab-example) to use                                           |
+| Key                      | Values | Default  | Description                                                                          |
+|:-------------------------|:------:|:--------:|--------------------------------------------------------------------------------------|
+| `row_count_label`        | String | "Result" | Non-plural label to use for the heading count. ex. "User" will display as "24 Users" |
+| `row_count_label_plural` | String |   n/a    | (optional) plural label to use for the heading count.                                |
+| `sort_options`           | Array  |   n/a    | (optional) Defines sorting options                                                   |
+| `tabs`                   | Array  |   n/a    | Defines filter [tabs](#tab-example) to use                                           |
 
 #### Without Tabs
 If tabs aren't needed, the widget type `charcoal/advanced-search/widget/advanced-search` can be used.
@@ -106,6 +108,7 @@ Instead of a `"filters": []` array, use a `"groups": []` array.
     "advancedSearchNew": {
         "type": "charcoal/advanced-search/widget/advanced-search",
         "rowCountLabel": "Result",
+        "rowCountLabelPlural": "Result",
         "sort_options": {
             "id": { "direction": "ASC" },
             "name": { "direction": "ASC" },
@@ -125,11 +128,12 @@ Instead of a `"filters": []` array, use a `"groups": []` array.
 ```
 
 #### Options
-| Key               | Values | Default  | Description                                                   |
-|:------------------|:------:|:--------:|---------------------------------------------------------------|
-| `row_count_label` | String | "Result" | Non-plural label to use for the heading count. ex. "24 Users" |
-| `sort_options`    | Array  |   n/a    | Defines sorting options                                       |
-| `groups`          | Array  |   n/a    | Defines filter [groups](#filter-group-example) to use         |
+| Key                      | Values | Default  | Description                                                   |
+|:-------------------------|:------:|:--------:|---------------------------------------------------------------|
+| `row_count_label`        | String | "Result" | Non-plural label to use for the heading count. ex. "24 Users" |
+| `row_count_label_plural` | String |   n/a    | (optional) plural label to use for the heading count.         |
+| `sort_options`           | Array  |   n/a    | Defines sorting options                                       |
+| `groups`                 | Array  |   n/a    | Defines filter [groups](#filter-group-example) to use         |
 
 
 ### Tabs
