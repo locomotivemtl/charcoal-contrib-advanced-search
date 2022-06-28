@@ -332,7 +332,7 @@
         } else {
             // Handle all inputs
             filterInput = $('#'+ filterId, this.$form);
-            filterType  = filterInput[0].type;
+            filterType  = filterInput.length ? filterInput[0].type : 'unknown';
         }
 
         // Reset respective input
@@ -471,7 +471,7 @@
 
             request = this.prepare_request(filters);
 
-            $.each(widgets, function (i, widget) {
+            widgets.forEach(function(widget) {
                 this.dispatch(request, widget);
             }.bind(this));
         }
@@ -491,7 +491,7 @@
         var orderProperty    = $(this.$sortBtn).data('property');
         var collection_table = this.opts('collection_table');
 
-        $.each(p_filters, function (key, filter_obj) {
+        p_filters.forEach(function (filter_obj) {
             var propName       = filter_obj.name.replace(/(\[.*)/gi, '');
             var filter_table   = null;
             var value_override = [];
