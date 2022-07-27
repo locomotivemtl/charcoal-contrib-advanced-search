@@ -291,6 +291,8 @@
         $('.datetimepickerinput').datetimepicker('clear');
         // Set changed inputs to unchanged state
         $('input.changed, select.changed', this.$form).removeClass('changed');
+        // Unrequire fields
+        $('input, select', this.$form).prop('required', false);
 
         this.countChanges();
 
