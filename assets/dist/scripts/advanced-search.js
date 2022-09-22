@@ -588,6 +588,23 @@
 
         widget.set_orders(orders);
 
+        // Support site search
+        var site_search = this.opts('site_search');
+
+        if (site_search.length > 0) {
+            var search_widget = Charcoal.Admin.manager().get_widget(site_search);
+
+            if (typeof widget.set_search_query === 'function') {
+                search_widget.set_search_query(search_widget.$input.val());
+                widget.set_search_query(search_widget.search_query());
+            }
+
+            if (typeof widget.set_filter === 'function') {
+                widget.set_filter('search', search_widget.search_filters());
+            }
+        }
+
+        // Reload the widget
         widget.reload(function (response) {
             if (response) {
                 this.setTotalRows(response.widget_data.total_rows);
