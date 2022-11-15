@@ -377,7 +377,7 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
 
                 if (!empty($source['filters'])) {
                     foreach ($source['filters'] as $filter) {
-                        $collection->addFilter($filter['property'], $filter['value']);
+                        $collection->addFilter($filter);
                     }
                 }
 
