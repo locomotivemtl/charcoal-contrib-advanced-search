@@ -23,6 +23,7 @@
     AdvancedSearch.prototype.init = function () {
         this.$form             = this.element();
         this.$applyBtn         = $('.js-filter-apply', this.$form);
+        this.$exportBtn        = $('.js-filter-export', this.$form);
         this.$sortBtn          = $('.sort-dropdown', this.$form);
         this.$activeFilterList = $('.active-filters', this.$form);
         this.totalRows         = 0;
@@ -133,6 +134,11 @@
             widget.countChanges();
         };
 
+        $(this.$exportBtn).on('click', function() {
+            widget.export();
+            return false;
+        });
+
         $('input, select', this.$form).on('change', onChange);
         $('.datetimepickerinput', this.$form).on('change.datetimepicker', onChange);
     };
@@ -179,7 +185,7 @@
 
     /**
      * Count total active filters.
-     * 
+     *
      * @returns {int} Total active filters.
      */
     AdvancedSearch.prototype.countActiveFilters = function () {
@@ -190,7 +196,7 @@
      * Clean filter ID of 'from'/'to'.
      *
      * @param {string} filterId
-     * @returns 
+     * @returns
      */
     AdvancedSearch.prototype.cleanFilterId = function (filterId) {
         var filterIdClean = filterId;
@@ -248,13 +254,14 @@
 
         if (changeCount > 0) {
             changeCountString = '(' + changeCount + ')';
-            $('.js-filter-apply, .js-filter-reset', this.$form).prop('disabled', false);
+            $('.js-filter-apply, .js-filter-reset, .js-filter-export', this.$form).prop('disabled', false);
         } else {
-            $('.js-filter-apply, .js-filter-reset', this.$form).prop('disabled', true);
+            $('.js-filter-apply, .js-filter-reset .js-filter-export', this.$form).prop('disabled', true);
         }
 
         // Set the label to singular/plural format
         $('.btn-label span.active', this.$applyBtn).removeClass('active');
+        $('.btn-label span.active', this.$exportBtn).removeClass('active');
 
         if (changeCount === 1) {
             $('.btn-label-singular', this.$applyBtn).addClass('active');
@@ -474,8 +481,129 @@
             request = this.prepare_request(filters);
 
             widgets.forEach(function(widget) {
+                console.log(widget, typeof widget.set_filters == 'function')
                 this.dispatch(request, widget);
             }.bind(this));
+        }
+
+        return this;
+    };
+
+
+    AdvancedSearch.prototype.export = function () {
+        var data, fields, filters = [], manager, widgets, request;
+        var that = this;
+
+        manager = Charcoal.Admin.manager();
+        widgets = manager.components.widgets;
+
+        if (widgets.length > 0) {
+            data    = this.$form.serializeArray();
+            fields  = this.$form.find(':input.changed');
+
+            $.each(fields, function (i, field) {
+                if (!!field.value) {
+                    filters.push(new that.filterObj(field, field.name, field.value));
+                }
+            });
+
+            request = this.prepare_request(filters);
+
+            var data = {};
+            widgets.forEach(function(widget) {
+                if(typeof widget.set_filters !== 'function') {
+                    return;
+                };
+
+                data = {
+                    widget_type:    widget.widget_type(),
+                    widget_options: widget.widget_options(),
+                    with_data:      true
+                }
+
+                var filters = [];
+                if (request.filters) {
+                    filters.push(request.filters);
+                }
+
+                var orders = [];
+                if (request.orders) {
+                    orders.push(request.orders);
+                }
+
+                data.widget_options.collection_config.filters = filters || {};
+                data.widget_options.collection_config.orders = orders || {};
+
+            }.bind(this));
+
+            var url  = Charcoal.Admin.admin_url() + 'advanced-search/export' + window.location.search;
+
+            $(this.$form).addClass('loading');
+
+            this.reloadXHR = $.ajax({
+                type:        'POST',
+                url:         url,
+                data:        JSON.stringify(data),
+                dataType:    'json',
+                contentType: 'application/json',
+            });
+
+            var success, failure, complete;
+
+            success = function (response) {
+                if (typeof response.widget_id !== 'string') {
+                    response.feedbacks.push({
+                        level: 'error',
+                        message: widgetL10n.loadingFailed
+                    });
+
+                    failure.call(this, response);
+                    return;
+                }
+
+                var wid = response.widget_id;
+                that.set_id(wid);
+                that.add_opts('id', wid);
+                that.add_opts('widget_id', wid);
+
+                that.widget_id = wid;
+                if (typeof response.file !== 'string') {
+                    response.feedbacks.push({
+                        level: 'error',
+                        message: widgetL10n.loadingFailed
+                    });
+                    failure.call(this, response);
+                    return;
+                }
+
+                window.location.href = Charcoal.Admin.admin_url() + 'advanced-search/download?filename=' + response.file;
+            };
+
+            failure = function (response) {
+                if (response.feedbacks.length) {
+                    Charcoal.Admin.feedback(response.feedbacks);
+                } else {
+                    Charcoal.Admin.feedback([ {
+                        level:   'error',
+                        message: widgetL10n.loadingFailed
+                    } ]);
+                }
+            };
+
+            complete = function () {
+                if (!that.suppress_feedback()) {
+                    Charcoal.Admin.feedback().dispatch();
+                }
+                $(that.$form).removeClass('loading');
+            };
+
+            Charcoal.Admin.resolveSimpleJsonXhr(
+                this.reloadXHR,
+                success,
+                failure,
+                complete
+            );
+
         }
 
         return this;
@@ -549,8 +677,6 @@
                 property:  orderProperty
             };
         }
-
-        console.log('Filters:', filters);
 
         return request;
     };
