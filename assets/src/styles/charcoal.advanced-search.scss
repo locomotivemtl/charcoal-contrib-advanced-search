@@ -48,9 +48,11 @@
 	}
 }
 
+.c-filters .btn-label {
+    display: inline-block;
+}
 .c-filters .js-filter-apply .btn-label {
-	display: inline-block;
-	span {
+    span {
 		display: none;
 		&.active,
 		&.filter-apply-count {

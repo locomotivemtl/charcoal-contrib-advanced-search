@@ -1,5 +1,6 @@
 /* global Charcoal */
 ;(function ($) {
+    var widgetL10n = window.widgetL10n || {};
     /**
      * Advanced search widget used for filtering a list
      * `charcoal/advanced-search/widget/advanced-search`
@@ -481,7 +482,6 @@
             request = this.prepare_request(filters);
 
             widgets.forEach(function(widget) {
-                console.log(widget, typeof widget.set_filters == 'function')
                 this.dispatch(request, widget);
             }.bind(this));
         }
@@ -491,7 +491,7 @@
 
 
     AdvancedSearch.prototype.export = function () {
-        var data, fields, filters = [], manager, widgets, request;
+        var data, fields, filters = {}, manager, widgets, request;
         var that = this;
 
         manager = Charcoal.Admin.manager();
@@ -508,18 +508,16 @@
             });
 
             request = this.prepare_request(filters);
-
-            var data = {};
             widgets.forEach(function(widget) {
                 if(typeof widget.set_filters !== 'function') {
                     return;
-                };
+                }
 
                 data = {
                     widget_type:    widget.widget_type(),
                     widget_options: widget.widget_options(),
                     with_data:      true
-                }
+                };
 
                 var filters = [];
                 if (request.filters) {
