@@ -491,7 +491,7 @@
 
 
     AdvancedSearch.prototype.export = function () {
-        var data, fields, filters = {}, manager, widgets, request;
+        var data, fields, filters = [], manager, widgets, request;
         var that = this;
 
         manager = Charcoal.Admin.manager();
