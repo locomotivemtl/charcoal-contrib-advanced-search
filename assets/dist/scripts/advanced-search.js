@@ -1,4 +1,4 @@
-/* global Charcoal */
+/* global Charcoal,AdvancedSearchFilterRecap */
 ;(function ($) {
     var widgetL10n = window.widgetL10n || {};
     /**
@@ -30,11 +30,20 @@
         this.totalRows         = 0;
         this.isReloading       = false;
 
+        // This is used to display the filters
+        this.filterRecap = new AdvancedSearchFilterRecap(this.$form, this.$activeFilterList, this);
+
         this.$form.on('submit.charcoal.search.filter', function (e) {
             e.preventDefault();
             e.stopPropagation();
             this.submit();
         }.bind(this));
+
+
+        var that = this;
+        this.$activeFilterList.on('click', '.js-remove-filter', function (e) {
+            that.filterRecap.removeActiveFilter(e.target);
+        });
 
         this.$form.on('click.charcoal.search.filter', '.js-filter-reset', this.clear.bind(this));
 
@@ -68,52 +77,8 @@
         var onChange = function (e) {
             // Add item to active-filters list
             var targetFilter  = e.target;
-            var filterWrapper = $(targetFilter).closest('fieldset');
             var formField     = $(targetFilter).attr('id');
-            var filterName    = $('label', filterWrapper).first().text();
             var filterVal     = $(targetFilter).val();
-            var filterType    = 'input';
-
-            // Date
-            if (typeof e.date !== 'undefined') {
-                var filterInput     = $('input', targetFilter).first();
-                var filterInputName = filterInput.attr('name');
-                formField           = filterInput.attr('id');
-
-                if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
-                    // Is a date range
-                    filterType = 'date-range';
-                    var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
-                    var dates = [
-                        $('input[name="'+ primaryName +'[from]"]').val() || null,
-                        $('input[name="'+ primaryName +'[to]"]').val()   || null
-                    ].filter(function (element) {
-                        return element !== null;
-                    });
-
-                    filterVal = dates.join(' - ');
-                } else {
-                    filterType = 'date';
-                    filterVal = filterInput.val();
-                }
-            }
-
-            // Select
-            if (targetFilter.tagName === 'SELECT') {
-                filterType = 'select';
-                filterVal = Array.from(targetFilter.selectedOptions).map(function (option) {
-                    return option.value ? option.innerHTML : null;
-                })
-                .filter(function (element) {
-                    return element !== null;
-                })
-                .join(', ');
-            }
-
-            if (targetFilter.type === 'checkbox') {
-                filterType = 'checkbox';
-                filterVal = $(targetFilter).is(':checked') ? ($('html').attr('lang') === 'fr' ? 'Oui' : 'Yes') : '';
-            }
 
             if (!filterVal.length) {
                 widget.removeActiveFilter(formField);
@@ -123,7 +88,6 @@
                     $(this).removeClass('changed');
                 }
             } else {
-                widget.updateActiveFilter(formField, filterName, filterVal, filterType);
                 // Check for inputs with values
                 if (!$(this).is('input, select')) {
                     $(this).find('input, select').addClass('changed');
@@ -132,6 +96,7 @@
                 }
             }
 
+            widget.filterRecap.refresh();
             widget.countChanges();
         };
 
@@ -142,46 +107,6 @@
 
         $('input, select', this.$form).on('change', onChange);
         $('.datetimepickerinput', this.$form).on('change.datetimepicker', onChange);
-    };
-
-    /**
-     * Add Active Filter.
-     *
-     * @param {string} id Unique ID.
-     * @param {string} label Filter label.
-     * @param {string} value Filter value.
-     * @param {string} type The type of the filter.
-     */
-    AdvancedSearch.prototype.addActiveFilter = function (id, label, value, type) {
-        var listItem = $('<li></li>')
-            .append($('<span></span>').addClass('label').text(label).attr('title', label))
-            .append($('<span></span>').addClass('value').text(value).attr('title', value))
-            .append($('<div></div>').addClass('remove fa fa-times').on('click', this.removeActiveFilter.bind(this)))
-            .attr('data-key', id)
-            .attr('data-type', type);
-        $(this.$activeFilterList).append(listItem);
-    };
-
-    /**
-     * Update Active Filter.
-     *
-     * @param {string} filterId Unique ID.
-     * @param {string} label Filter label.
-     * @param {string} value Filter value.
-     * @param {string} [filterType] The type of the filter.
-     */
-    AdvancedSearch.prototype.updateActiveFilter = function (filterId, label, value, filterType) {
-        var filterIdClean = this.cleanFilterId(filterId);
-        var listItem = $('li[data-key="'+ filterIdClean +'"]', this.$activeFilterList);
-        var type = $(listItem).data('type') || filterType || 'input';
-
-        if (listItem.length) {
-            $(listItem).attr('data-type', type);
-            $('.label', listItem).text(label).attr('title', label);
-            $('.value', listItem).text(value).attr('title', value);
-        } else {
-            this.addActiveFilter(filterIdClean, label, value, type);
-        }
     };
 
     /**
@@ -212,29 +137,12 @@
     /**
      * Remove item from active filter list.
      *
-     * @param {event|string} e Remove Event or target string.
+     * @param {string} target Remove Event or target string.
      */
-    AdvancedSearch.prototype.removeActiveFilter = function (e) {
-        var target = e;
-
-        if (typeof target === 'string') {
-            target = this.cleanFilterId(target);
-            target = $('li[data-key="'+ target +'"]', this.$activeFilterList);
-        } else {
-            target = e.target;
-        }
-
-        var listItem = $(target).closest('li');
-
-        if (listItem.length) {
-            if (this.countActiveFilters() === 1) {
-                this.clear();
-                return;
-            }
-
-            this.clearFilter(listItem);
-            listItem.remove();
-        }
+    AdvancedSearch.prototype.removeActiveFilter = function (target) {
+        target = this.cleanFilterId(target);
+        target = $('li[data-key="'+ target +'"]', this.$activeFilterList);
+        this.filterRecap.removeActiveFilter(target.get(0));
     };
 
     AdvancedSearch.prototype.setTotalRows = function (totalRows) {
@@ -743,3 +651,197 @@
     Charcoal.Admin.Widget_Advanced_Search      = AdvancedSearch;
     Charcoal.Admin.Widget_Advanced_Search_Tabs = AdvancedSearch;
 }(jQuery));
+;var AdvancedSearchFilterRecap = function ($form, $activeFilterList, parent) {
+    this.$form             = $form;
+    this.$activeFilterList = $activeFilterList;
+    this.filterObject      = undefined;
+    this.parent            = parent;
+};
+
+/**
+ * Event
+ * Call when anything changes in the filter area
+ */
+AdvancedSearchFilterRecap.prototype.refresh = function () {
+    this.buildFilterObjectFromInputs();
+    this.displayFilters();
+};
+
+/**
+ * Fetch all inputs and build a json usable to display filters
+ *
+ * @param $container
+ */
+AdvancedSearchFilterRecap.prototype.buildFilterObjectFromInputs = function () {
+    var output = [];
+    var that   = this;
+
+    $('input, select', this.$form).each(function (i, current) {
+        // Skip unfilled filters
+        // @todo Add more context than only !current.value
+        if (!current.value) {
+            return true;
+        }
+
+        if (current.type === 'checkbox' && !$(current).is(':checked')) {
+            return true;
+        }
+
+        // Populate output
+        output.push(that.extractLabelAndValueFromInput(current));
+    });
+
+    this.filterObject = output;
+};
+
+AdvancedSearchFilterRecap.prototype.extractLabelAndValueFromInput = function (domElement) {
+    var tmp    = null;
+
+    // Base values
+    var $domElement = $(domElement);
+    var formField   = $domElement.attr('id');
+    var filterVal   = $domElement.val();
+    var filterType  = 'input';
+
+    // Filter name from label
+    var filterWrapper = $domElement.closest('fieldset');
+    var filterName    = $('label', filterWrapper).first().text();
+
+    var inputName = $domElement.attr('name');
+
+    // Most certainly a datetime range
+    if (inputName.endsWith("[to]") || inputName.endsWith("[from]")) {
+        tmp = this.extractFromDateRange(domElement);
+    }
+
+    // Select
+    if (domElement.tagName === 'SELECT') {
+        tmp = this.extractFromSelect(domElement);
+    }
+
+    // Checkbox
+    if (domElement.type === 'checkbox') {
+        tmp = this.extractFromCheckbox(domElement);
+    }
+
+    // OVerride values
+    if (tmp !== null && tmp) {
+        filterType = tmp.type;
+        filterVal  = tmp.val;
+    }
+
+    return {
+        id:   formField,
+        type: filterType,
+        val:  filterVal,
+        name: filterName
+    };
+};
+
+/**
+ *
+ * @param $input
+ * @returns {{val: string, type: string}}
+ */
+AdvancedSearchFilterRecap.prototype.extractFromDateRange = function (domElement) {
+    var filterInput         = $('input', domElement).first();
+    var filterInputName     = filterInput.attr('name');
+
+    // Is a date range
+    var filterType  = 'date-range';
+    var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
+    var dates       = [
+        $('input[name="' + primaryName + '[from]"]').val() || null,
+        $('input[name="' + primaryName + '[to]"]').val() || null
+    ].filter(function (element) {
+        return element !== null;
+    });
+
+    var filterVal = dates.join(' - ');
+
+    return {
+        type: filterType,
+        val:  filterVal
+    };
+};
+
+AdvancedSearchFilterRecap.prototype.extractFromSelect = function (domElement) {
+    var filterType = 'select';
+    var filterVal  = Array.from(domElement.selectedOptions).map(function (option) {
+                              return option.value ? option.innerHTML : null;
+                          })
+                          .filter(function (element) {
+                              return element !== null;
+                          })
+                          .join(', ');
+
+    return {
+        type: filterType,
+        val:  filterVal
+    };
+};
+
+/**
+ * Weird, it should definitly be Yes at all time at this point
+ *
+ * @param domElement
+ * @returns {{val: (string), type: string}}
+ */
+AdvancedSearchFilterRecap.prototype.extractFromCheckbox = function (domElement) {
+    var filterVal = $(domElement).is(':checked') ? ($('html').attr('lang') === 'fr' ? 'Oui' : 'Yes') : '';
+
+    return {
+        type: 'checkbox',
+        val:  filterVal
+    };
+};
+
+/**
+ * Display filters labels from the json
+ */
+AdvancedSearchFilterRecap.prototype.displayFilters = function () {
+    if (this.filterObject === undefined) {
+        return;
+    }
+    this.$activeFilterList.empty();
+
+    for (var i in this.filterObject) {
+        var currentFilter = this.filterObject[i];
+        this.addActiveFilter(currentFilter);
+    }
+};
+
+/**
+ * Add Active Filter.
+ *
+ * @param opts { id: id, type: type, label: label, val: val }
+ */
+AdvancedSearchFilterRecap.prototype.addActiveFilter = function (opts) {
+    var id    = opts.id;
+    var type  = opts.type;
+    var label = opts.name;
+    var value = opts.val;
+
+    var listItem = $('<li></li>')
+        .append($('<span></span>').addClass('label').text(label).attr('title', label))
+        .append($('<span></span>').addClass('value').text(value).attr('title', value))
+        .append($('<div></div>').addClass('remove fa fa-times js-remove-filter'))
+        .attr('data-key', id)
+        .attr('data-type', type);
+    $(this.$activeFilterList).append(listItem);
+};
+
+
+/**
+ * Remove item from active filter list.
+ *
+ * @param {event|string} e Remove Event or target string.
+ */
+AdvancedSearchFilterRecap.prototype.removeActiveFilter = function (domElement) {
+    var listItem = $(domElement).closest('li');
+
+    if (listItem.length) {
+        this.parent.clearFilter(listItem);
+        listItem.remove();
+    }
+};
