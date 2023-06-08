@@ -84,6 +84,27 @@
             if (e.target.type === 'checkbox') {
                 filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
             }
+            // Date
+            if (typeof e.date !== 'undefined') {
+                var filterInput     = $('input', targetFilter).first();
+                var filterInputName = filterInput.attr('name');
+                formField           = filterInput.attr('id');
+
+                if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
+                    // Is a date range
+                    var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
+                    var dates = [
+                        $('input[name="'+ primaryName +'[from]"]').val() || null,
+                        $('input[name="'+ primaryName +'[to]"]').val()   || null
+                    ].filter(function (element) {
+                        return element !== null;
+                    });
+
+                    filterVal = dates.join(' - ');
+                } else {
+                    filterVal = filterInput.val();
+                }
+            }
 
             if (!filterVal.length) {
                 widget.removeActiveFilter(formField);
@@ -680,6 +701,7 @@ AdvancedSearchFilterRecap.prototype.refresh = function () {
 AdvancedSearchFilterRecap.prototype.buildFilterObjectFromInputs = function () {
     var output = [];
     var that   = this;
+    var formFieldIds = [];
 
     $('input, select', this.$form).each(function (i, current) {
         // Skip unfilled filters
@@ -692,8 +714,13 @@ AdvancedSearchFilterRecap.prototype.buildFilterObjectFromInputs = function () {
             return true;
         }
 
-        // Populate output
-        output.push(that.extractLabelAndValueFromInput(current));
+        var value = that.extractLabelAndValueFromInput(current);
+
+        if (!formFieldIds.includes(value.id)) {
+            formFieldIds.push(value.id);
+            // Populate output
+            output.push(value);
+        }
     });
 
     this.filterObject = output;
@@ -716,6 +743,9 @@ AdvancedSearchFilterRecap.prototype.extractLabelAndValueFromInput = function (do
 
     // Most certainly a datetime range
     if (inputName.endsWith("[to]") || inputName.endsWith("[from]")) {
+        // The formField id will be used to prevent having twice the safe filter displayed in the list
+        // Since the from and to inputs have the same ID except for that prefix
+        formField = formField.replace('from_', '').replace('to_', '');
         tmp = this.extractFromDateRange(domElement);
     }
 
@@ -749,7 +779,7 @@ AdvancedSearchFilterRecap.prototype.extractLabelAndValueFromInput = function (do
  * @returns {{val: string, type: string}}
  */
 AdvancedSearchFilterRecap.prototype.extractFromDateRange = function (domElement) {
-    var filterInput         = $('input', domElement).first();
+    var filterInput         = $(domElement);
     var filterInputName     = filterInput.attr('name');
 
     // Is a date range

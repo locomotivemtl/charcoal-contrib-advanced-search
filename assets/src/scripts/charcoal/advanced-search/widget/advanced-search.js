@@ -84,6 +84,27 @@
             if (e.target.type === 'checkbox') {
                 filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
             }
+            // Date
+            if (typeof e.date !== 'undefined') {
+                var filterInput     = $('input', targetFilter).first();
+                var filterInputName = filterInput.attr('name');
+                formField           = filterInput.attr('id');
+
+                if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
+                    // Is a date range
+                    var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
+                    var dates = [
+                        $('input[name="'+ primaryName +'[from]"]').val() || null,
+                        $('input[name="'+ primaryName +'[to]"]').val()   || null
+                    ].filter(function (element) {
+                        return element !== null;
+                    });
+
+                    filterVal = dates.join(' - ');
+                } else {
+                    filterVal = filterInput.val();
+                }
+            }
 
             if (!filterVal.length) {
                 widget.removeActiveFilter(formField);
