@@ -80,6 +80,11 @@
             var formField     = $(targetFilter).attr('id');
             var filterVal     = $(targetFilter).val();
 
+            // Checkboxes are different!
+            if (e.target.type === 'checkbox') {
+                filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
+            }
+
             if (!filterVal.length) {
                 widget.removeActiveFilter(formField);
                 if (!$(this).is('input, select')) {
