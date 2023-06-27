@@ -716,6 +716,10 @@ AdvancedSearchFilterRecap.prototype.buildFilterObjectFromInputs = function () {
 
         var value = that.extractLabelAndValueFromInput(current);
 
+        if (!value) {
+            return ;
+        }
+
         if (!formFieldIds.includes(value.id)) {
             formFieldIds.push(value.id);
             // Populate output
@@ -740,6 +744,10 @@ AdvancedSearchFilterRecap.prototype.extractLabelAndValueFromInput = function (do
     var filterName    = $('label', filterWrapper).first().text();
 
     var inputName = $domElement.attr('name');
+
+    if (typeof inputName === 'undefined') {
+        return false;
+    }
 
     // Most certainly a datetime range
     if (inputName.endsWith("[to]") || inputName.endsWith("[from]")) {
