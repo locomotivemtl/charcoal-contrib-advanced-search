@@ -4,6 +4,4 @@ import AdvancedSearch from "./advanced-search";
 ;(function () {
     Charcoal.Admin.Widget_Advanced_Search      = AdvancedSearch;
     Charcoal.Admin.Widget_Advanced_Search_Tabs = AdvancedSearch;
-
-    console.log("Advanced Search: Loaded");
 }(jQuery));

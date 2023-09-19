@@ -71,7 +71,7 @@ class AdvancedSearchFilterRecap {
             return false;
         }
 
-        // Most certainly a datetime range
+        // Datetime range
         if (inputName.endsWith("[to]") || inputName.endsWith("[from]")) {
             // The formField id will be used to prevent having twice the safe filter displayed in the list
             // Since the from and to inputs have the same ID except for that prefix
@@ -89,7 +89,7 @@ class AdvancedSearchFilterRecap {
             tmp = this.extractFromCheckbox(domElement);
         }
 
-        // OVerride values
+        // Override values
         if (tmp !== null && tmp) {
             filterType = tmp.type;
             filterVal = tmp.val;
@@ -179,7 +179,11 @@ class AdvancedSearchFilterRecap {
     /**
      * Add Active Filter.
      *
-     * @param opts { id: id, type: type, label: label, val: val }
+     * @param {object} opts
+     * @param {string} opts.id
+     * @param {string} opts.type
+     * @param {string} opts.label
+     * @param {string} opts.val
      */
     addActiveFilter(opts) {
         const id = opts.id;
@@ -199,7 +203,7 @@ class AdvancedSearchFilterRecap {
     /**
      * Remove item from active filter list.
      *
-     * @param {event|string} e Remove Event or target string.
+     * @param {Element|string} domElement Remove Event or target string.
      */
     removeActiveFilter(domElement) {
         const listItem = $(domElement).closest('li');
@@ -207,6 +211,7 @@ class AdvancedSearchFilterRecap {
         if (listItem.length) {
             this.parent.clearFilter(listItem);
             listItem.remove();
+            this.parent.countChanges();
         }
     }
 }
