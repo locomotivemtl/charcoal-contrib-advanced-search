@@ -3,7 +3,7 @@
         "sass",
         "postcss",
         "cssmin",
-        "concat",
+        "browserify",
         "jscs",
         "jshint",
         "jsonlint",
@@ -13,7 +13,7 @@
     ],
 
     "scripts": [
-        "concat",
+        "browserify",
         "jscs",
         "jshint",
         "jsonlint",
