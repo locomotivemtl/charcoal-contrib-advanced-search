@@ -1,27 +1,29 @@
-/* global Charcoal,AdvancedSearchFilterRecap */
-;(function ($) {
-    var widgetL10n = window.widgetL10n || {};
-    /**
-     * Advanced search widget used for filtering a list
-     * `charcoal/advanced-search/widget/advanced-search`
-     *
-     * Require:
-     * - jQuery
-     *
-     * @param  {Object}  opts Options for widget
-     */
-    var AdvancedSearch = function (opts) {
+/* global Charcoal */
+import AdvancedSearchFilterRecap from "./filter-recap";
+
+const widgetL10n = window.widgetL10n || {};
+const $ = jQuery;
+
+/**
+ * Advanced search widget used for filtering a list
+ * `charcoal/advanced-search/widget/advanced-search`
+ *
+ * Require:
+ * - jQuery
+ *
+ * @param  {Object}  opts Options for widget
+ */
+class AdvancedSearch extends Charcoal.Admin.Widget {
+
+    constructor(opts) {
         if (!opts.data.properties_options) {
             opts.data.properties_options = {};
         }
+        super(opts);
         Charcoal.Admin.Widget.call(this, opts);
-    };
+    }
 
-    AdvancedSearch.prototype             = Object.create(Charcoal.Admin.Widget.prototype);
-    AdvancedSearch.prototype.constructor = Charcoal.Admin.Widget_Advanced_Search;
-    AdvancedSearch.prototype.parent      = Charcoal.Admin.Widget.prototype;
-
-    AdvancedSearch.prototype.init = function () {
+    init() {
         this.$form             = this.element();
         this.$applyBtn         = $('.js-filter-apply', this.$form);
         this.$exportBtn        = $('.js-filter-export', this.$form);
@@ -29,6 +31,7 @@
         this.$activeFilterList = $('.active-filters', this.$form);
         this.totalRows         = 0;
         this.isReloading       = false;
+        this.clearOnEmpty      = false;
 
         // This is used to display the filters
         this.filterRecap = new AdvancedSearchFilterRecap(this.$form, this.$activeFilterList, this);
@@ -39,10 +42,14 @@
             this.submit();
         }.bind(this));
 
-
-        var that = this;
+        const that = this;
         this.$activeFilterList.on('click', '.js-remove-filter', function (e) {
             that.filterRecap.removeActiveFilter(e.target);
+
+            // Clear everything if that was the last filter.
+            if (this.clearOnEmpty && this.countChanges() === 0) {
+                this.clear();
+            }
         });
 
         this.$form.on('click.charcoal.search.filter', '.js-filter-reset', this.clear.bind(this));
@@ -54,8 +61,8 @@
             this.sort.bind(this)
         );
 
-        $('.c-filters-tab').on('click', function() {
-            var tab_key = $(this).attr('data-tab');
+        $('.c-filters-tab').on('click', function () {
+            const tab_key = $(this).attr('data-tab');
 
             // Activate tab button
             $('.c-filters-tab').removeClass('active');
@@ -73,76 +80,103 @@
             $('.c-filters-tab').first().click();
         }
 
-        var widget = this;
-        var onChange = function (e) {
-            // Add item to active-filters list
-            var targetFilter  = e.target;
-            var formField     = $(targetFilter).attr('id');
-            var filterVal     = $(targetFilter).val();
+        const widget = this;
 
-            // Checkboxes are different!
-            if (e.target.type === 'checkbox') {
-                filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
-            }
-            // Date
-            if (typeof e.date !== 'undefined') {
-                var filterInput     = $('input', targetFilter).first();
-                var filterInputName = filterInput.attr('name');
-                formField           = filterInput.attr('id');
-
-                if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
-                    // Is a date range
-                    var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
-                    var dates = [
-                        $('input[name="'+ primaryName +'[from]"]').val() || null,
-                        $('input[name="'+ primaryName +'[to]"]').val()   || null
-                    ].filter(function (element) {
-                        return element !== null;
-                    });
-
-                    filterVal = dates.join(' - ');
-                } else {
-                    filterVal = filterInput.val();
-                }
-            }
-
-            if (!filterVal.length) {
-                widget.removeActiveFilter(formField);
-                if (!$(this).is('input, select')) {
-                    $(this).find('.changed').removeClass('changed');
-                } else {
-                    $(this).removeClass('changed');
-                }
-            } else {
-                // Check for inputs with values
-                if (!$(this).is('input, select')) {
-                    $(this).find('input, select').addClass('changed');
-                } else {
-                    $(this).addClass('changed');
-                }
-            }
-
-            widget.filterRecap.refresh();
-            widget.countChanges();
-        };
-
-        $(this.$exportBtn).on('click', function() {
+        $(this.$exportBtn).on('click', function () {
             widget.export();
             return false;
         });
 
-        $('input, select', this.$form).on('change', onChange);
-        $('.datetimepickerinput', this.$form).on('change.datetimepicker', onChange);
-    };
+        $('input, select', this.$form).on('change', (e) => widget.onFieldChange(e));
+        $('.datetimepickerinput', this.$form).on('change.datetimepicker', (e) => widget.onFieldChange(e));
+        $($('input:not([type=hidden]), select:not([type=hidden])', this.$form)[0]).trigger('change');
+
+        if (this.countActiveFilters() > 0) {
+            this.clearOnEmpty = true;
+
+            const manager = Charcoal.Admin.manager();
+            manager.ready(() => { 
+                const widgets = manager.components.widgets;
+
+                if (widgets.length > 0) {
+                    widgets.forEach(function (widget) {
+                        if (!widget || typeof widget.set_filters !== 'function') {
+                            return this;
+                        }
+
+                        const total_rows = widget.opts('data').total_rows ?? null;
+
+                        if (total_rows !== null) {
+                            this.setTotalRows(total_rows);
+                        }
+                    }.bind(this));
+                }
+            });
+        }
+    }
+
+    onFieldChange(e) {
+        // Add item to active-filters list
+        const widget = this;
+        const targetFilter = e.target;
+        let formField    = $(targetFilter).attr('id');
+        let filterVal    = $(targetFilter).val();
+
+        // Checkboxes are different!
+        if (e.target.type === 'checkbox') {
+            filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
+        }
+
+        // Date
+        if (typeof e.date !== 'undefined') {
+            const filterInput     = $('input', targetFilter).first();
+            const filterInputName = filterInput.attr('name');
+            formField             = filterInput.attr('id');
+
+            if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
+                // Is a date range
+                const primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
+                const dates = [
+                    $('input[name="' + primaryName + '[from]"]').val() || null,
+                    $('input[name="' + primaryName + '[to]"]').val()   || null
+                ].filter(function (element) {
+                    return element !== null;
+                });
+
+                filterVal = dates.join(' - ');
+            } else {
+                filterVal = filterInput.val();
+            }
+        }
+
+        if (!filterVal.length) {
+            widget.removeActiveFilter(formField);
+            if (!$(targetFilter).is('input, select')) {
+                $(targetFilter).find('.changed').removeClass('changed');
+            } else {
+                $(targetFilter).removeClass('changed');
+            }
+        } else {
+            // Check for inputs with values
+            if (!$(targetFilter).is('input, select')) {
+                $(targetFilter).find('input, select').addClass('changed');
+            } else {
+                $(targetFilter).addClass('changed');
+            }
+        }
+
+        widget.filterRecap.refresh();
+        widget.countChanges();
+    }
 
     /**
      * Count total active filters.
      *
      * @returns {int} Total active filters.
      */
-    AdvancedSearch.prototype.countActiveFilters = function () {
+    countActiveFilters() {
         return $('li', this.$activeFilterList).length;
-    };
+    }
 
     /**
      * Clean filter ID of 'from'/'to'.
@@ -150,85 +184,82 @@
      * @param {string} filterId
      * @returns
      */
-    AdvancedSearch.prototype.cleanFilterId = function (filterId) {
-        var filterIdClean = filterId;
+    cleanFilterId(filterId) {
+        let filterIdClean = filterId;
 
         if (filterId.includes('from_input_') || filterId.includes('to_input_')) {
             filterIdClean = filterIdClean.replace('from_', '').replace('to_', '');
         }
 
         return filterIdClean;
-    };
+    }
 
     /**
      * Remove item from active filter list.
      *
      * @param {string} target Remove Event or target string.
      */
-    AdvancedSearch.prototype.removeActiveFilter = function (target) {
+    removeActiveFilter(target) {
         target = this.cleanFilterId(target);
-        target = $('li[data-key="'+ target +'"]', this.$activeFilterList);
+        target = $('li[data-key="' + target + '"]', this.$activeFilterList);
         this.filterRecap.removeActiveFilter(target.get(0));
-    };
+    }
 
-    AdvancedSearch.prototype.setTotalRows = function (totalRows) {
+    setTotalRows(totalRows) {
         this.totalRows = totalRows;
-        var totalRowsEl = $('.filters-total-rows').first();
+        const totalRowsEl = $('.filters-total-rows').first();
         totalRowsEl.find('.row-count').text(this.totalRows);
         totalRowsEl.attr('data-count', this.totalRows);
-    };
+    }
 
     /**
      * Count all changed filters.
      *
      * @returns {int} Change count.
      */
-    AdvancedSearch.prototype.countChanges = function () {
-        var changeCount       = $('input.changed, select.changed', this.$form).length;
-        var changeCountString = '';
+    countChanges() {
+        const changeCount = $('input.changed, select.changed', this.$form).length;
+        const hasChanges = changeCount > 0;
+        const changeCountString = hasChanges ? '(' + changeCount + ')' : '';
 
-        if (changeCount > 0) {
-            changeCountString = '(' + changeCount + ')';
-            $('.js-filter-apply, .js-filter-reset, .js-filter-export', this.$form).prop('disabled', false);
-        } else {
-            $('.js-filter-apply, .js-filter-reset .js-filter-export', this.$form).prop('disabled', true);
-        }
+        // Disable buttons when there are no changes
+        $('.js-filter-apply, .js-filter-reset, .js-filter-export', this.$form).prop('disabled', !hasChanges);
 
         // Set the label to singular/plural format
         $('.btn-label span.active', this.$applyBtn).removeClass('active');
         $('.btn-label span.active', this.$exportBtn).removeClass('active');
-
-        if (changeCount === 1) {
-            $('.btn-label-singular', this.$applyBtn).addClass('active');
-        } else {
-            $('.btn-label-plural', this.$applyBtn).addClass('active');
-        }
+        $((changeCount === 1 ? '.btn-label-singular' : '.btn-label-plural'), this.$applyBtn).addClass('active');
 
         // Append change count to apply button
         $('.filter-apply-count', this.$applyBtn).text(changeCountString);
 
         // Add tab filter count to tab label
         $('.c-filter-group').each(function () {
-            var tabChangeCount   = $('input.changed, select.changed', this).length;
-            var tabFilterCountEl = $('.c-filters-tab[data-tab="'+ $(this).data('tab') +'"] .tab-filter-count');
+            const tabChangeCount = $('input.changed, select.changed', this).length;
+            const tabFilterCountEl = $('.c-filters-tab[data-tab="' + $(this).data('tab') + '"] .tab-filter-count');
 
             tabFilterCountEl.attr('data-count', tabChangeCount);
             tabFilterCountEl.find('.count').text(tabChangeCount);
         });
 
         return changeCount;
-    };
+    }
 
     /**
      * Resets the filter widgets.
      *
      * @return this
      */
-    AdvancedSearch.prototype.clear = function () {
+    clear() {
         // Reset form
         this.$form[0].reset();
+
         // Clear selects
-        this.$form.find('select').selectpicker('refresh');
+        this.$form.find('select').each((index, item) => {
+            $(item).val('');
+            $(item).selectpicker('refresh');
+        });
+
         // Clear date pickers
         $('.datetimepickerinput').datetimepicker('clear');
         // Set changed inputs to unchanged state
@@ -245,7 +276,7 @@
 
         this.submit();
         return this;
-    };
+    }
 
     /**
      * Resets a filter.
@@ -253,30 +284,30 @@
      * @param {string} filterId Filter ID.
      * @return this
      */
-    AdvancedSearch.prototype.clearFilter = function (listItem) {
+    clearFilter(listItem) {
         if (!$(listItem).length) {
             return;
         }
 
-        var filterId     = $(listItem).data('key');
-        var listItemType = $(listItem).data('type');
-        var filterInput, filterType;
+        const filterId = $(listItem).data('key');
+        const listItemType = $(listItem).data('type');
+        let filterInput, filterType;
 
         if (listItemType.includes('date')) {
             // Handle date pickers
             if (listItemType === 'date-range') {
                 // Date Range
-                filterType  = 'date-range';
-                filterInput = $('#from_'+ filterId, this.$form);
+                filterType = 'date-range';
+                filterInput = $('#from_' + filterId, this.$form);
             } else {
                 // Single Date
-                filterType  = 'date';
-                filterInput = $('#'+ filterId, this.$form);
+                filterType = 'date';
+                filterInput = $('#' + filterId, this.$form);
             }
         } else {
             // Handle all inputs
-            filterInput = $('#'+ filterId, this.$form);
-            filterType  = filterInput.length ? filterInput[0].type : 'unknown';
+            filterInput = $('#' + filterId, this.$form);
+            filterType = filterInput.length ? filterInput[0].type : 'unknown';
         }
 
         // Reset respective input
@@ -304,7 +335,7 @@
         $(filterInput).removeClass('changed');
 
         return this;
-    };
+    }
 
     /**
      * Change the widget sorting order.
@@ -312,9 +343,9 @@
      * @param {object} e Event.
      * @return this
      */
-    AdvancedSearch.prototype.sort = function (e) {
-        var optionEl = $(e.target).closest('.dropdown-item');
-        var label    = $('.btn-label', optionEl).text();
+    sort(e) {
+        const optionEl = $(e.target).closest('.dropdown-item');
+        const label = $('.btn-label', optionEl).text();
 
         if ($(optionEl).hasClass('default')) {
             // Reset button to default sort
@@ -322,7 +353,7 @@
         } else {
             // Perform sort
             $(this.$sortBtn).addClass('selected').data({
-                property:  optionEl.data('property'),
+                property: optionEl.data('property'),
                 direction: optionEl.data('direction')
             });
             $('.sort-option', this.$sortBtn).find('.sort-option-value').text(label);
@@ -331,7 +362,7 @@
         this.submit();
 
         return this;
-    };
+    }
 
     /**
      * Filter object definition.
@@ -340,9 +371,9 @@
      * @param {string} name Filter name.
      * @param {string} value Filter value.
      */
-    AdvancedSearch.prototype.filterObj = function (input, name, value) {
-        var formField    = $(input).closest('.form-field');
-        var dataOperator = formField.data('operator') || '';
+    filterObj(input, name, value) {
+        const formField    = $(input).closest('.form-field');
+        const dataOperator = formField.data('operator') || '';
 
         this.name     = name;
         this.value    = value;
@@ -370,16 +401,16 @@
         }
 
         if (this.type === 'select-multiple') {
-            this.value    = $(input).val();
+            this.value = $(input).val();
             this.operator = "IN";
         }
 
         if (name.endsWith("[from]") || name.endsWith("[to]")) {
-            this.type     = 'daterange';
+            this.type = 'daterange';
             this.operator = 'BETWEEN';
             this.matching = name.endsWith('[from]') ? name.replace('[from]', '[to]') : name.replace('[to]', '[from]');
 
-            var matching_value = $('input[name="'+ this.matching +'"]').val();
+            const matching_value = $('input[name="' + this.matching + '"]').val();
 
             if (!this.value.length || !matching_value.length) {
                 if (!this.value.length) {
@@ -389,23 +420,23 @@
                 }
             }
         }
-    };
+    }
 
     /**
      * Submit the filters to all widgets.
      *
      * @return this
      */
-    AdvancedSearch.prototype.submit = function () {
-        var data, fields, filters = [], manager, widgets, request;
-        var that = this;
+    submit() {
+        let data, fields, filters = [], manager, widgets, request;
+        const that = this;
 
         manager = Charcoal.Admin.manager();
         widgets = manager.components.widgets;
 
         if (widgets.length > 0) {
-            data    = this.$form.serializeArray();
-            fields  = this.$form.find(':input.changed');
+            data = this.$form.serializeArray();
+            fields = this.$form.find(':input.changed');
 
             $.each(fields, function (i, field) {
                 if (!!field.value) {
@@ -413,27 +444,28 @@
                 }
             });
 
+            this.clearOnEmpty = filters.length > 0;
+
             request = this.prepare_request(filters);
 
-            widgets.forEach(function(widget) {
+            widgets.forEach(function (widget) {
                 this.dispatch(request, widget);
             }.bind(this));
         }
 
         return this;
-    };
+    }
 
-
-    AdvancedSearch.prototype.export = function () {
-        var data, fields, filters = [], manager, widgets, request;
-        var that = this;
+    export() {
+        let data, fields, filters = [], manager, widgets, request;
+        const that = this;
 
         manager = Charcoal.Admin.manager();
         widgets = manager.components.widgets;
 
         if (widgets.length > 0) {
-            data    = this.$form.serializeArray();
-            fields  = this.$form.find(':input.changed');
+            data = this.$form.serializeArray();
+            fields = this.$form.find(':input.changed');
 
             $.each(fields, function (i, field) {
                 if (!!field.value) {
@@ -442,23 +474,23 @@
             });
 
             request = this.prepare_request(filters);
-            widgets.forEach(function(widget) {
-                if(typeof widget.set_filters !== 'function') {
+            widgets.forEach(function (widget) {
+                if (typeof widget.set_filters !== 'function') {
                     return;
                 }
 
                 data = {
-                    widget_type:    widget.widget_type(),
+                    widget_type: widget.widget_type(),
                     widget_options: widget.widget_options(),
-                    with_data:      true
+                    with_data: true
                 };
 
-                var filters = [];
+                const filters = [];
                 if (request.filters) {
                     filters.push(request.filters);
                 }
 
-                var orders = [];
+                const orders = [];
                 if (request.orders) {
                     orders.push(request.orders);
                 }
@@ -468,19 +500,19 @@
 
             }.bind(this));
 
-            var url  = Charcoal.Admin.admin_url() + 'advanced-search/export' + window.location.search;
+            const url = Charcoal.Admin.admin_url() + 'advanced-search/export' + window.location.search;
 
             $(this.$form).addClass('loading');
 
             this.reloadXHR = $.ajax({
-                type:        'POST',
-                url:         url,
-                data:        JSON.stringify(data),
-                dataType:    'json',
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(data),
+                dataType: 'json',
                 contentType: 'application/json',
             });
 
-            var success, failure, complete;
+            let success, failure, complete;
 
             success = function (response) {
                 if (typeof response.widget_id !== 'string') {
@@ -493,7 +525,7 @@
                     return;
                 }
 
-                var wid = response.widget_id;
+                const wid = response.widget_id;
                 that.set_id(wid);
                 that.add_opts('id', wid);
                 that.add_opts('widget_id', wid);
@@ -515,10 +547,10 @@
                 if (response.feedbacks.length) {
                     Charcoal.Admin.feedback(response.feedbacks);
                 } else {
-                    Charcoal.Admin.feedback([ {
-                        level:   'error',
+                    Charcoal.Admin.feedback([{
+                        level: 'error',
                         message: widgetL10n.loadingFailed
-                    } ]);
+                    }]);
                 }
             };
 
@@ -539,7 +571,7 @@
         }
 
         return this;
-    };
+    }
 
     /**
      * Prepares a search request from a query.
@@ -547,16 +579,16 @@
      * @param  {array} query - The filters.
      * @return {object|null} A search request object or NULL.
      */
-    AdvancedSearch.prototype.prepare_request = function (p_filters) {
-        var request          = null, filters = [], opts;
-        var data             = this.opts('data');
-        var orderProperty    = $(this.$sortBtn).data('property');
-        var collection_table = this.opts('collection_table');
+    prepare_request(p_filters) {
+        let request            = null, filters = [], opts;
+        const data             = this.opts('data');
+        const orderProperty    = $(this.$sortBtn).data('property');
+        const collection_table = this.opts('collection_table');
 
         p_filters.forEach(function (filter_obj) {
-            var propName       = filter_obj.name.replace(/(\[.*)/gi, '');
-            var filter_table   = null;
-            var value_override = [];
+            const propName     = filter_obj.name.replace(/(\[.*)/gi, '');
+            let filter_table   = null;
+            let value_override = [];
 
             opts = data.properties_options[propName] || {};
 
@@ -571,47 +603,47 @@
                         return false;
                     }
 
-                    var matching_value = $('input[name="'+ filter_obj.matching +'"]').val();
+                    const matching_value = $('input[name="' + filter_obj.matching + '"]').val();
 
                     if (filter_obj.name.endsWith('[from]')) {
-                        value_override = [ filter_obj.value, matching_value ];
+                        value_override = [filter_obj.value, matching_value];
                     } else {
-                        value_override = [ matching_value, filter_obj.value ];
+                        value_override = [matching_value, filter_obj.value];
                     }
                 }
             }
 
             filters.push({
                 conjunction: opts.conjunction || 'AND',
-                table:       filter_table,
-                property:    propName,
-                value:       value_override.length ? value_override : filter_obj.value,
-                operator:    filter_obj.operator
+                table: filter_table,
+                property: propName,
+                value: value_override.length ? value_override : filter_obj.value,
+                operator: filter_obj.operator
             });
         });
 
         request = {
             filters: null,
-            orders:  null,
+            orders: null,
         };
 
         if (filters.length) {
             request.filters = {
                 filters: filters,
-                table:   collection_table
+                table: collection_table
             };
         }
 
         if ($(this.$sortBtn).hasClass('selected') && orderProperty) {
             request.orders = {
                 direction: $(this.$sortBtn).data('direction'),
-                mode:      $(this.$sortBtn).data('direction'),
-                property:  orderProperty
+                mode: $(this.$sortBtn).data('direction'),
+                property: orderProperty
             };
         }
 
         return request;
-    };
+    }
 
     /**
      * Dispatches the event to all widgets that can listen to it.
@@ -620,7 +652,7 @@
      * @param  {object} widget  - The widget to search on.
      * @return this
      */
-    AdvancedSearch.prototype.dispatch = function (request, widget) {
+    dispatch(request, widget) {
         if (this.isReloading || !widget || typeof widget.set_filters !== 'function') {
             return this;
         }
@@ -629,14 +661,14 @@
             widget.pagination.page = 1;
         }
 
-        var filters = [];
+        const filters = [];
         if (request.filters) {
             filters.push(request.filters);
         }
 
         widget.set_filters(filters);
 
-        var orders = [];
+        const orders = [];
         if (request.orders) {
             orders.push(request.orders);
         }
@@ -647,7 +679,7 @@
         widget.set_orders(orders);
 
         // Support site search
-        var site_search = this.opts('site_search');
+        const site_search = this.opts('site_search');
 
         if (site_search.length > 0) {
             var search_widget = Charcoal.Admin.manager().get_widget(site_search);
@@ -672,8 +704,7 @@
         }.bind(this), true);
 
         return this;
-    };
+    }
+}
 
-    Charcoal.Admin.Widget_Advanced_Search      = AdvancedSearch;
-    Charcoal.Admin.Widget_Advanced_Search_Tabs = AdvancedSearch;
-}(jQuery));
+export default AdvancedSearch;
