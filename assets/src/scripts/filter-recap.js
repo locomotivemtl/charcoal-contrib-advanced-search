@@ -211,7 +211,6 @@ class AdvancedSearchFilterRecap {
         if (listItem.length) {
             this.parent.clearFilter(listItem);
             listItem.remove();
-            this.parent.countChanges();
         }
     }
 }

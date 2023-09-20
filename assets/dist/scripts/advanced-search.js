@@ -48,6 +48,7 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
   _createClass(AdvancedSearch, [{
     key: "init",
     value: function init() {
+      var _this2 = this;
       this.$form = this.element();
       this.$applyBtn = $('.js-filter-apply', this.$form);
       this.$exportBtn = $('.js-filter-export', this.$form);
@@ -55,6 +56,7 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
       this.$activeFilterList = $('.active-filters', this.$form);
       this.totalRows = 0;
       this.isReloading = false;
+      this.clearOnEmpty = false;
 
       // This is used to display the filters
       this.filterRecap = new _filterRecap["default"](this.$form, this.$activeFilterList, this);
@@ -89,57 +91,88 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
         $('.c-filters-tab').first().click();
       }
       var widget = this;
-      var onChange = function onChange(e) {
-        // Add item to active-filters list
-        var targetFilter = e.target;
-        var formField = $(targetFilter).attr('id');
-        var filterVal = $(targetFilter).val();
+      /*const onChange = function (e) {
+          widget.onFieldChange(e);
+      };*/
 
-        // Checkboxes are different!
-        if (e.target.type === 'checkbox') {
-          filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
-        }
-
-        // Date
-        if (typeof e.date !== 'undefined') {
-          var filterInput = $('input', targetFilter).first();
-          var filterInputName = filterInput.attr('name');
-          formField = filterInput.attr('id');
-          if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
-            // Is a date range
-            var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
-            var dates = [$('input[name="' + primaryName + '[from]"]').val() || null, $('input[name="' + primaryName + '[to]"]').val() || null].filter(function (element) {
-              return element !== null;
-            });
-            filterVal = dates.join(' - ');
-          } else {
-            filterVal = filterInput.val();
-          }
-        }
-        if (!filterVal.length) {
-          widget.removeActiveFilter(formField);
-          if (!$(this).is('input, select')) {
-            $(this).find('.changed').removeClass('changed');
-          } else {
-            $(this).removeClass('changed');
-          }
-        } else {
-          // Check for inputs with values
-          if (!$(this).is('input, select')) {
-            $(this).find('input, select').addClass('changed');
-          } else {
-            $(this).addClass('changed');
-          }
-        }
-        widget.filterRecap.refresh();
-        widget.countChanges();
-      };
       $(this.$exportBtn).on('click', function () {
         widget["export"]();
         return false;
       });
-      $('input, select', this.$form).on('change', onChange);
-      $('.datetimepickerinput', this.$form).on('change.datetimepicker', onChange);
+      $('input, select', this.$form).on('change', function (e) {
+        return widget.onFieldChange(e);
+      });
+      $('.datetimepickerinput', this.$form).on('change.datetimepicker', function (e) {
+        return widget.onFieldChange(e);
+      });
+      $($('input:not([type=hidden]), select:not([type=hidden])', this.$form)[0]).trigger('change');
+      if (this.countActiveFilters() > 0) {
+        this.clearOnEmpty = true;
+        var manager = Charcoal.Admin.manager();
+        manager.ready(function () {
+          var widgets = manager.components.widgets;
+          if (widgets.length > 0) {
+            widgets.forEach(function (widget) {
+              var _widget$opts$total_ro;
+              if (!widget || typeof widget.set_filters !== 'function') {
+                return this;
+              }
+              var total_rows = (_widget$opts$total_ro = widget.opts('data').total_rows) !== null && _widget$opts$total_ro !== void 0 ? _widget$opts$total_ro : null;
+              if (total_rows !== null) {
+                this.setTotalRows(total_rows);
+              }
+            }.bind(_this2));
+          }
+        });
+      }
+    }
+  }, {
+    key: "onFieldChange",
+    value: function onFieldChange(e) {
+      // Add item to active-filters list
+      var widget = this;
+      var targetFilter = e.target;
+      var formField = $(targetFilter).attr('id');
+      var filterVal = $(targetFilter).val();
+
+      // Checkboxes are different!
+      if (e.target.type === 'checkbox') {
+        filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
+      }
+
+      // Date
+      if (typeof e.date !== 'undefined') {
+        var filterInput = $('input', targetFilter).first();
+        var filterInputName = filterInput.attr('name');
+        formField = filterInput.attr('id');
+        if (filterInputName.endsWith("[to]") || filterInputName.endsWith("[from]")) {
+          // Is a date range
+          var primaryName = filterInputName.replace('[from]', '').replace('[to]', '');
+          var dates = [$('input[name="' + primaryName + '[from]"]').val() || null, $('input[name="' + primaryName + '[to]"]').val() || null].filter(function (element) {
+            return element !== null;
+          });
+          filterVal = dates.join(' - ');
+        } else {
+          filterVal = filterInput.val();
+        }
+      }
+      if (!filterVal.length) {
+        widget.removeActiveFilter(formField);
+        if (!$(targetFilter).is('input, select')) {
+          $(targetFilter).find('.changed').removeClass('changed');
+        } else {
+          $(targetFilter).removeClass('changed');
+        }
+      } else {
+        // Check for inputs with values
+        if (!$(targetFilter).is('input, select')) {
+          $(targetFilter).find('input, select').addClass('changed');
+        } else {
+          $(targetFilter).addClass('changed');
+        }
+      }
+      widget.filterRecap.refresh();
+      widget.countChanges();
     }
 
     /**
@@ -233,8 +266,13 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
     value: function clear() {
       // Reset form
       this.$form[0].reset();
+
       // Clear selects
-      this.$form.find('select').selectpicker('refresh');
+      this.$form.find('select').each(function (index, item) {
+        $(item).val('');
+        $(item).selectpicker('refresh');
+      });
+
       // Clear date pickers
       $('.datetimepickerinput').datetimepicker('clear');
       // Set changed inputs to unchanged state
@@ -409,6 +447,7 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
             filters.push(new that.filterObj(field, field.name, field.value));
           }
         });
+        this.clearOnEmpty = filters.length > 0;
         request = this.prepare_request(filters);
         widgets.forEach(function (widget) {
           this.dispatch(request, widget);
@@ -719,7 +758,7 @@ var AdvancedSearchFilterRecap = /*#__PURE__*/function () {
         return false;
       }
 
-      // Most certainly a datetime range
+      // Datetime range
       if (inputName.endsWith("[to]") || inputName.endsWith("[from]")) {
         // The formField id will be used to prevent having twice the safe filter displayed in the list
         // Since the from and to inputs have the same ID except for that prefix
@@ -737,7 +776,7 @@ var AdvancedSearchFilterRecap = /*#__PURE__*/function () {
         tmp = this.extractFromCheckbox(domElement);
       }
 
-      // OVerride values
+      // Override values
       if (tmp !== null && tmp) {
         filterType = tmp.type;
         filterVal = tmp.val;
@@ -823,7 +862,11 @@ var AdvancedSearchFilterRecap = /*#__PURE__*/function () {
     /**
      * Add Active Filter.
      *
-     * @param opts { id: id, type: type, label: label, val: val }
+     * @param {object} opts
+     * @param {string} opts.id
+     * @param {string} opts.type
+     * @param {string} opts.label
+     * @param {string} opts.val
      */
   }, {
     key: "addActiveFilter",
@@ -839,7 +882,7 @@ var AdvancedSearchFilterRecap = /*#__PURE__*/function () {
     /**
      * Remove item from active filter list.
      *
-     * @param {event|string} e Remove Event or target string.
+     * @param {Element|string} domElement Remove Event or target string.
      */
   }, {
     key: "removeActiveFilter",
@@ -848,6 +891,9 @@ var AdvancedSearchFilterRecap = /*#__PURE__*/function () {
       if (listItem.length) {
         this.parent.clearFilter(listItem);
         listItem.remove();
+        if (this.parent.clearOnEmpty && this.parent.countChanges() === 0) {
+          this.parent.clear();
+        }
       }
     }
   }]);
@@ -867,7 +913,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 (function () {
   Charcoal.Admin.Widget_Advanced_Search = _advancedSearch["default"];
   Charcoal.Admin.Widget_Advanced_Search_Tabs = _advancedSearch["default"];
-  console.log("Advanced Search: Loaded");
 })(jQuery);
 
 },{"./advanced-search":1}]},{},[3]);
