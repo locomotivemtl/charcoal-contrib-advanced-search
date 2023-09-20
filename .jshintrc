@@ -5,7 +5,7 @@
     "eqnull": true,
     "undef": true,
     "unused": true,
-    "esversion": 6,
+    "esversion": 11,
     "globals": {
         "Charcoal": true,
         "$": true,
