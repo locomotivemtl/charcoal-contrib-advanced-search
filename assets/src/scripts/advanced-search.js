@@ -46,10 +46,8 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         this.$activeFilterList.on('click', '.js-remove-filter', function (e) {
             that.filterRecap.removeActiveFilter(e.target);
 
-            // Clear everything if that was the last filter.
-            if (this.clearOnEmpty && this.countChanges() === 0) {
-                this.clear();
-            }
+            // Clear everything if there are no more active filters.
+            if (that.countChanges() === 0 && that.clearOnEmpty) { that.clear(); }
         });
 
         this.$form.on('click.charcoal.search.filter', '.js-filter-reset', this.clear.bind(this));
@@ -166,7 +164,8 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         }
 
         widget.filterRecap.refresh();
-        widget.countChanges();
+        // Clear everything if there are no more active filters.
+        if (widget.countChanges() === 0 && widget.clearOnEmpty) { widget.clear(); }
     }
 
     /**
