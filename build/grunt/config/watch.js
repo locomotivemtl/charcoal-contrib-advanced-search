@@ -4,8 +4,8 @@ module.exports = {
         livereload: false
     },
     javascript: {
-        files: [ '<%= paths.js.src %>/**/*.js', '<%= paths.grunt %>/config/concat.js' ],
-        tasks: [ 'concat', 'uglify', 'notify:javascript' ]
+        files: [ '<%= paths.js.src %>/**/*.js' ],
+        tasks: [ 'browserify', 'uglify', 'notify:javascript' ]
     },
     sass: {
         files: [ '<%= paths.css.src %>/**/*.scss' ],

@@ -33,6 +33,7 @@
         "postcss-banner": "3.0.0"
     },
     "scripts": {
-        "build": "grunt default"
+        "build": "grunt default",
+        "watch": "grunt watch"
     }
 }
