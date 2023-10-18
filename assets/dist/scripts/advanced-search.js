@@ -68,6 +68,11 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
       var that = this;
       this.$activeFilterList.on('click', '.js-remove-filter', function (e) {
         that.filterRecap.removeActiveFilter(e.target);
+
+        // Clear everything if that was the last filter.
+        if (this.clearOnEmpty && this.countChanges() === 0) {
+          this.clear();
+        }
       });
       this.$form.on('click.charcoal.search.filter', '.js-filter-reset', this.clear.bind(this));
 
@@ -91,10 +96,6 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
         $('.c-filters-tab').first().click();
       }
       var widget = this;
-      /*const onChange = function (e) {
-          widget.onFieldChange(e);
-      };*/
-
       $(this.$exportBtn).on('click', function () {
         widget["export"]();
         return false;
@@ -632,7 +633,17 @@ var AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
       if (typeof widget.pagination !== 'undefined') {
         widget.pagination.page = 1;
       }
+
+      // Initialize filters array
       var filters = [];
+
+      // Add isAdvancedSearch dummy filter.
+      // This can be used to detect if a table widget was loaded using Advanced Search
+      filters.push({
+        conjunction: 'AND',
+        name: 'isAdvancedSearch',
+        condition: '(1 = 1)'
+      });
       if (request.filters) {
         filters.push(request.filters);
       }
@@ -891,9 +902,6 @@ var AdvancedSearchFilterRecap = /*#__PURE__*/function () {
       if (listItem.length) {
         this.parent.clearFilter(listItem);
         listItem.remove();
-        if (this.parent.clearOnEmpty && this.parent.countChanges() === 0) {
-          this.parent.clear();
-        }
       }
     }
   }]);

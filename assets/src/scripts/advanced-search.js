@@ -661,7 +661,17 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
             widget.pagination.page = 1;
         }
 
+        // Initialize filters array
         const filters = [];
+
+        // Add isAdvancedSearch dummy filter.
+        // This can be used to detect if a table widget was loaded using Advanced Search
+        filters.push({
+            conjunction: 'AND',
+            name: 'isAdvancedSearch',
+            condition: '(1 = 1)',
+        });
+
         if (request.filters) {
             filters.push(request.filters);
         }
