@@ -206,6 +206,22 @@ class AdvancedSearchFilterRecap {
      * @param {Element|string} domElement Remove Event or target string.
      */
     removeActiveFilter(domElement) {
+        var filter_recap = this;
+
+        // Remove all filters if domElement is undefined.
+        if (typeof domElement === 'undefined') {
+            $('li', filter_recap.$activeFilterList).each(function() {
+                filter_recap.removeListItem(this);
+            });
+            return;
+        }
+
+        // Remove domElement from the active filter list.
+        filter_recap.removeListItem(domElement);
+    }
+
+    removeListItem(domElement) {
+        // Remove domElement from the active filter list.
         const listItem = $(domElement).closest('li');
 
         if (listItem.length) {

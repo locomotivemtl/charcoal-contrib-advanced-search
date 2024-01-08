@@ -199,6 +199,11 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
      * @param {string} target Remove Event or target string.
      */
     removeActiveFilter(target) {
+        if (typeof target === 'undefined') {
+            this.filterRecap.removeActiveFilter();
+            return;
+        }
+
         target = this.cleanFilterId(target);
         target = $('li[data-key="' + target + '"]', this.$activeFilterList);
         this.filterRecap.removeActiveFilter(target.get(0));
@@ -251,18 +256,22 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
      */
     clear() {
         // Reset form
-        this.$form[0].reset();
+        this.removeActiveFilter();
 
         // Clear selects
         this.$form.find('select').each((index, item) => {
             $(item).val('');
-            $(item).selectpicker('refresh');
+            $(item).selectpicker('deselectAll');
         });
 
         // Clear date pickers
-        $('.datetimepickerinput').datetimepicker('clear');
+        $('.datetimepickerinput').each(function() {
+            if ($('.datetimepicker-input', this).val().length) {
+                $(this).datetimepicker('clear');
+            }
+        });
         // Set changed inputs to unchanged state
-        $('input.changed, select.changed', this.$form).removeClass('changed');
+        $('.changed', this.$form).removeClass('changed');
         // Unrequire fields
         $('input, select', this.$form).prop('required', false);
 
