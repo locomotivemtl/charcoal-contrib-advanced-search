@@ -410,7 +410,9 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
 
         if (this.type === 'select-multiple') {
             this.value = $(input).val();
-            this.operator = "IN";
+            if (this.operator !== 'FIND_IN_SET') {
+                this.operator = "IN";
+            }
         }
 
         if (name.endsWith("[from]") || name.endsWith("[to]")) {
@@ -638,6 +640,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         if (filters.length) {
             request.filters = {
                 filters: filters,
+                name: 'advanced-search',
                 table: collection_table
             };
         }
