@@ -230,6 +230,16 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
 
         if (!empty($groups)) {
             foreach ($groups as $groupKey => $group) {
+
+                if (is_string($group)) {
+                    $group = $this->adminConfig()->get($group);
+                    if (empty($group)) {
+                        unset($groups[$groupKey]);
+                        continue;
+                    }
+                    $groups[$groupKey] = $group;
+                }
+
                 $filters = [];
                 $group['filters_options'] = $group['filters_options'] ?? [];
                 $filterLayout = null;

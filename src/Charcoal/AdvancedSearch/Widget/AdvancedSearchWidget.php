@@ -2,8 +2,6 @@
 
 namespace Charcoal\AdvancedSearch\Widget;
 
-use Pimple\Container;
-
 /**
  * Class Advanced Search Widget
  */
@@ -37,10 +35,6 @@ class AdvancedSearchWidget extends AbstractAdvancedSearchWidget
 
     public function setGroups($groups)
     {
-        foreach ($groups as $key => $group) {
-            $groups[$key]['group_key'] = $key;
-        }
-
         $this->groups = $groups;
         return $this;
     }
