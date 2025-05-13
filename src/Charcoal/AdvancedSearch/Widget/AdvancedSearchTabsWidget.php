@@ -2,8 +2,6 @@
 
 namespace Charcoal\AdvancedSearch\Widget;
 
-use Pimple\Container;
-
 /**
  * Class Advanced Search Tabs Widget
  */
@@ -24,6 +22,15 @@ class AdvancedSearchTabsWidget extends AbstractAdvancedSearchWidget
 
     public function setTabs($tabs)
     {
+        // Support for tabs in admin config
+        if (is_string($tabs)) {
+            $tabs = $this->adminConfig()->get($tabs);
+        }
+
+        if (empty($tabs)) {
+            throw new \InvalidArgumentException('Tabs for advanced search widget cannot be empty');
+        }
+
         foreach ($tabs as $key => $tab) {
             $tabs[$key]['tab_key'] = $key;
         }
