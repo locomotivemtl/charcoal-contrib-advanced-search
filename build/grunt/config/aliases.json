@@ -6,7 +6,7 @@
         "browserify",
         "jshint",
         "jsonlint",
-        "uglify",
+        "terser",
         "svg_sprite",
         "notify:build"
     ],
@@ -15,7 +15,7 @@
         "browserify",
         "jshint",
         "jsonlint",
-        "uglify",
+        "terser",
         "notify:build"
     ],
 
