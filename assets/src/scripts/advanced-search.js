@@ -85,7 +85,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
             return false;
         });
 
-        $('input, select', this.$form).on('change', (e) => widget.onFieldChange(e));
+        this.$form.on('change', 'input, select', (e) => widget.onFieldChange(e));
         $('.datetimepickerinput', this.$form).on('change.datetimepicker', (e) => widget.onFieldChange(e));
         $($('input:not([type=hidden]), select:not([type=hidden])', this.$form)[0]).trigger('change');
 
@@ -93,7 +93,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
             this.clearOnEmpty = true;
 
             const manager = Charcoal.Admin.manager();
-            manager.ready(() => { 
+            manager.ready(() => {
                 const widgets = manager.components.widgets;
 
                 if (widgets.length > 0) {
@@ -119,6 +119,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         const targetFilter = e.target;
         let formField    = $(targetFilter).attr('id');
         let filterVal    = $(targetFilter).val();
+
 
         // Checkboxes are different!
         if (e.target.type === 'checkbox') {
