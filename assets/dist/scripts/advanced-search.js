@@ -156,7 +156,15 @@ let AdvancedSearch = /*#__PURE__*/function (_Charcoal$Admin$Widge) {
       const widget = this;
       const targetFilter = e.target;
       let formField = $(targetFilter).attr('id');
-      let filterVal = $(targetFilter).val(); // Checkboxes are different!
+      let filterVal = $(targetFilter).val();
+      let filterName = $(targetFilter).attr('name');
+
+      if (!filterName && typeof e.date === 'undefined') {
+        // Date range filters don't have filtername and are yet valid filters
+        // All other shall fail
+        return;
+      } // Checkboxes are different!
+
 
       if (e.target.type === 'checkbox') {
         filterVal = $(targetFilter).is(':checked') ? 'checked' : '';
