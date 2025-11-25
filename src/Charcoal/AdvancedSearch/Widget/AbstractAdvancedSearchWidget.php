@@ -355,6 +355,20 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
                 }
             }
 
+            // Set input type to readonly if user doesn't have required permissions
+            try {
+                if (!empty($this->authenticator()) && !empty($this->authorizer())) {
+                    $currentUser     = $this->authenticator()->user();
+                    $propPermissions = ($prop->requiredAclPermissions() ?? []);
+
+                    if (!$this->authorizer()->userAllowed($currentUser, $propPermissions)) {
+                        $prop->setInputType('charcoal/admin/property/input/readonly');
+                    }
+                }
+            } catch (\Throwable $th) {
+                // Authenticator or authorizer aren't defined
+            }
+
             yield $propertyKey => $prop;
         }
     }
