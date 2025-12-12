@@ -89,6 +89,11 @@ class AdvancedSearchFilterRecap {
             tmp = this.extractFromCheckbox(domElement);
         }
 
+        // Selectize
+        if (domElement.classList.contains('selectized')) {
+            filterVal = domElement.parentElement.querySelector('.selectize-input .item').textContent;
+        }
+
         // Override values
         if (tmp !== null && tmp) {
             filterType = tmp.type;
