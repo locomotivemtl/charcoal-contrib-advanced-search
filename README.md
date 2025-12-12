@@ -258,22 +258,31 @@ To run the scripts (phplint, phpcs, and phpunit):
 $ composer test
 ```
 
+
 ### Assets
 
-To install assets build environment: 
+To install the assets build environment:
 
 ```shell
 $ yarn install
 ```
 
-To run the build scripts: 
+To build assets (JS/SCSS):
 ```shell
-$ grunt watch
+$ yarn build
 ```
-or
+
+To start a dev server with hot reload:
 ```shell
-$ grunt
+$ yarn dev
 ```
+
+To watch and rebuild assets on change:
+```shell
+$ yarn watch
+```
+
+Assets are built with [Vite](https://vitejs.dev/). Output is written to `assets/dist/` and referenced in `config/admin.json`.
 
 
 ### API Documentation
