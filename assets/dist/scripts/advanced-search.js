@@ -501,6 +501,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         }
       }
     }
+    return this;
   }
   /**
    * Submit the filters to all widgets.
@@ -517,7 +518,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
       fields = this.$form.find(":input.changed");
       $$1.each(fields, function(i, field) {
         if (!!field.value) {
-          filters.push(new that.filterObj(field, field.name, field.value));
+          filters.push(that.filterObj(field, field.name, field.value));
         }
       });
       this.clearOnEmpty = filters.length > 0;
@@ -538,7 +539,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
       fields = this.$form.find(":input.changed");
       $$1.each(fields, function(i, field) {
         if (!!field.value) {
-          filters.push(new that.filterObj(field, field.name, field.value));
+          filters.push(that.filterObj(field, field.name, field.value));
         }
       });
       request = this.prepare_request(filters);

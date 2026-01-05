@@ -437,6 +437,8 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
                 }
             }
         }
+
+        return this;
     }
 
     /**
@@ -457,7 +459,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
 
             $.each(fields, function (i, field) {
                 if (!!field.value) {
-                    filters.push(new that.filterObj(field, field.name, field.value));
+                    filters.push(that.filterObj(field, field.name, field.value));
                 }
             });
 
@@ -486,7 +488,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
 
             $.each(fields, function (i, field) {
                 if (!!field.value) {
-                    filters.push(new that.filterObj(field, field.name, field.value));
+                    filters.push(that.filterObj(field, field.name, field.value));
                 }
             });
 
