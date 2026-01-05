@@ -501,7 +501,13 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         }
       }
     }
-    return this;
+    return {
+      name: this.name,
+      value: this.value,
+      operator: this.operator,
+      type: this.type,
+      matching: this.matching
+    };
   }
   /**
    * Submit the filters to all widgets.
