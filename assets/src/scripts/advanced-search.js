@@ -322,7 +322,12 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         } else {
             // Handle all inputs
             filterInput = $('#' + filterId, this.$form);
-            filterType = filterInput.length ? filterInput[0].type : 'unknown';
+
+            if (filterInput.hasClass('selectized')) {
+                filterType = 'selectize';
+            } else {
+                filterType = filterInput.length ? filterInput[0].type : 'unknown';
+            }
         }
 
         // Reset respective input
@@ -341,6 +346,9 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
                 filterInput.closest('fieldset').find('.datetimepickerinput').datetimepicker('clear');
                 filterInput.closest('fieldset').find('.changed').removeClass('changed');
                 break;
+
+            case 'selectize':
+                $(filterInput)[0].selectize.clear();
 
             default:
                 filterInput.val('');
