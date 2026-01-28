@@ -1,8 +1,8 @@
 /* global Charcoal */
 import AdvancedSearchFilterRecap from "./filter-recap";
 
-const widgetL10n = window.widgetL10n || {};
-const $ = jQuery;
+var widgetL10n = window.widgetL10n || {};
+var $ = jQuery;
 
 /**
  * Advanced search widget used for filtering a list
