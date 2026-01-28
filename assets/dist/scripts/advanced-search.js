@@ -176,8 +176,8 @@ class AdvancedSearchFilterRecap {
     }
   }
 }
-const widgetL10n = window.widgetL10n || {};
-const $$1 = jQuery;
+var widgetL10n = window.widgetL10n || {};
+var $$1 = jQuery;
 class AdvancedSearch extends Charcoal.Admin.Widget {
   constructor(opts) {
     if (!opts.data.properties_options) {
