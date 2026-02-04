@@ -93,7 +93,6 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         $(document).ready(() => {
             // Submit search widget with initial search is needed
             if (this.$form.find('.form-control.changed').length) {
-                console.log('submit')
                 this.submit()
             }
         })

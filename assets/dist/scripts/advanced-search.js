@@ -236,7 +236,6 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
     $$1($$1("input:not([type=hidden]), select:not([type=hidden])", this.$form)[0]).trigger("change");
     $$1(document).ready(() => {
       if (this.$form.find(".form-control.changed").length) {
-        console.log("submit");
         this.submit();
       }
     });
