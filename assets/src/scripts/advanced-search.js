@@ -89,6 +89,15 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         $('.datetimepickerinput', this.$form).on('change.datetimepicker', (e) => widget.onFieldChange(e));
         $($('input:not([type=hidden]), select:not([type=hidden])', this.$form)[0]).trigger('change');
 
+        // hack to submit initial filters.
+        $(document).ready(() => {
+            // Submit search widget with initial search is needed
+            if (this.$form.find('.form-control.changed').length) {
+                console.log('submit')
+                this.submit()
+            }
+        })
+
         if (this.countActiveFilters() > 0) {
             this.clearOnEmpty = true;
 
