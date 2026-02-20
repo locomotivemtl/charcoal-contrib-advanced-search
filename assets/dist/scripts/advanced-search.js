@@ -479,6 +479,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
     this.value = value;
     this.operator = "=";
     this.type = input.type;
+    this.condition = formField.data("condition") || null;
     this.parseInvalidBetween = function(name2, value2) {
       this.type = "date";
       this.value = value2;
@@ -517,7 +518,8 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
       value: this.value,
       operator: this.operator,
       type: this.type,
-      matching: this.matching
+      matching: this.matching,
+      condition: this.condition
     };
   }
   /**
@@ -671,12 +673,22 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
           }
         }
       }
+      if (filter_obj.condition) {
+        const condition_value = filter_obj.condition.replace(/{{value}}/gi, filter_obj.value);
+        filters.push({
+          conjunction: opts.conjunction || "AND",
+          table: filter_table,
+          condition: condition_value
+        });
+        return;
+      }
       filters.push({
         conjunction: opts.conjunction || "AND",
         table: filter_table,
         property: propName,
         value: value_override.length ? value_override : filter_obj.value,
-        operator: filter_obj.operator
+        operator: filter_obj.operator,
+        condition: filter_obj.condition
       });
     });
     request = {
