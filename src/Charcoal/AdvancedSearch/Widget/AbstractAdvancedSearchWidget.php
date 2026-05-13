@@ -405,6 +405,12 @@ abstract class AbstractAdvancedSearchWidget extends AdminWidget implements
                     }
                 }
 
+                if (!empty($source['orders'])) {
+                    foreach ($source['orders'] as $order) {
+                        $collection->addOrder($order);
+                    }
+                }
+
                 $modelCollection = $collection->load();
 
                 $choices = array_map(function ($item) use ($input) {
