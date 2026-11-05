@@ -356,7 +356,7 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
     const changeCount = $$1("input.changed, select.changed", this.$form).length;
     const hasChanges = changeCount > 0;
     const changeCountString = hasChanges ? "(" + changeCount + ")" : "";
-    $$1(".js-filter-apply, .js-filter-reset, .js-filter-export", this.$form).prop("disabled", !hasChanges);
+    $$1(".js-filter-apply, .js-filter-reset", this.$form).prop("disabled", !hasChanges);
     $$1(".btn-label span.active", this.$applyBtn).removeClass("active");
     $$1(".btn-label span.active", this.$exportBtn).removeClass("active");
     $$1(changeCount === 1 ? ".btn-label-singular" : ".btn-label-plural", this.$applyBtn).addClass("active");

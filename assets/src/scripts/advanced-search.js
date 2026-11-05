@@ -241,8 +241,8 @@ class AdvancedSearch extends Charcoal.Admin.Widget {
         const hasChanges = changeCount > 0;
         const changeCountString = hasChanges ? '(' + changeCount + ')' : '';
 
-        // Disable buttons when there are no changes
-        $('.js-filter-apply, .js-filter-reset, .js-filter-export', this.$form).prop('disabled', !hasChanges);
+        // Disable buttons when there are no changes, but always allow exporting.
+        $('.js-filter-apply, .js-filter-reset', this.$form).prop('disabled', !hasChanges);
 
         // Set the label to singular/plural format
         $('.btn-label span.active', this.$applyBtn).removeClass('active');
